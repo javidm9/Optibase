@@ -1,0 +1,443 @@
+<div class="h-screen w-screen bg-gray-100 text-gray-950 p-6 flex flex-col overflow-hidden font-sans box-border">
+
+  <!-- HEADER -->
+  <header class="shrink-0 flex items-center justify-between border-b-2 border-gray-950 pb-3 mb-4">
+    <div class="flex items-center gap-6">
+      <button (click)="volverAlMenu()" class="font-mono text-xs font-bold text-gray-400 hover:text-gray-950 border-b-2 border-transparent hover:border-gray-950 transition-colors uppercase tracking-widest cursor-pointer">
+        &lt; MENU
+      </button>
+      <div>
+        <h1 class="text-5xl font-black tracking-tighter uppercase italic text-gray-950">Agenda<span class="text-gray-400">_</span></h1>
+        <p class="text-[9px] font-mono font-bold text-gray-400 tracking-widest leading-none mt-1 uppercase">
+          CITAS_HOY: {{citasHoy}} // PENDIENTES_TOTAL: {{citasPendientes}}
+        </p>
+      </div>
+    </div>
+    <div class="flex items-center gap-4">
+      <!-- Toggle vistas -->
+      <div class="flex border-2 border-gray-950">
+        <button (click)="vistaActual = 'lista'"
+          class="font-mono text-[10px] font-black px-3 py-2 uppercase tracking-widest transition-colors cursor-pointer"
+          [class.bg-gray-950]="vistaActual === 'lista'"
+          [class.text-white]="vistaActual === 'lista'"
+          [class.text-gray-500]="vistaActual !== 'lista'">
+          Lista
+        </button>
+        <button (click)="vistaActual = 'semana'"
+          class="font-mono text-[10px] font-black px-3 py-2 uppercase tracking-widest border-l-2 border-gray-950 transition-colors cursor-pointer"
+          [class.bg-gray-950]="vistaActual === 'semana'"
+          [class.text-white]="vistaActual === 'semana'"
+          [class.text-gray-500]="vistaActual !== 'semana'">
+          Semana
+        </button>
+        <button (click)="vistaActual = 'mes'"
+          class="font-mono text-[10px] font-black px-3 py-2 uppercase tracking-widest border-l-2 border-gray-950 transition-colors cursor-pointer"
+          [class.bg-gray-950]="vistaActual === 'mes'"
+          [class.text-white]="vistaActual === 'mes'"
+          [class.text-gray-500]="vistaActual !== 'mes'">
+          Mes
+        </button>
+      </div>
+      <button (click)="abrirNueva()" class="bg-white text-gray-950 px-6 py-2.5 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 cursor-pointer">
+        + NUEVA_CITA
+      </button>
+    </div>
+  </header>
+
+  <!-- FILTROS — solo en vista lista -->
+  @if (vistaActual === 'lista') {
+    <section class="shrink-0 flex flex-wrap items-end gap-6 mb-4 px-2">
+      <div class="border-l-4 border-gray-950 pl-4">
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Filtro_Cliente</label>
+        <input [(ngModel)]="filtroCliente" (input)="aplicarFiltros()" type="text" placeholder="Nombre..." class="bg-transparent outline-none py-1 text-sm font-bold w-44">
+      </div>
+      <div class="border-l-4 border-gray-950 pl-4">
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Filtro_Estado</label>
+        <select [(ngModel)]="filtroEstado" (change)="aplicarFiltros()" class="bg-transparent outline-none py-1 text-sm font-bold cursor-pointer">
+          <option value="">Todos</option>
+          <option value="PENDIENTE">Pendiente</option>
+          <option value="COMPLETADA">Completada</option>
+          <option value="CANCELADA">Cancelada</option>
+        </select>
+      </div>
+      <div class="border-l-4 border-gray-950 pl-4">
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Filtro_Fecha</label>
+        <input [(ngModel)]="filtroFecha" (change)="aplicarFiltros()" type="date" class="bg-transparent outline-none py-1 text-sm font-mono font-bold">
+      </div>
+      <div class="flex gap-2">
+        <button (click)="filtrarHoy()" class="font-mono text-[10px] font-black border-2 border-gray-950 px-3 py-1.5 hover:bg-gray-950 hover:text-white transition-all uppercase cursor-pointer">HOY</button>
+        <button (click)="limpiarFiltros()" class="font-mono text-[10px] font-black border-2 border-gray-300 px-3 py-1.5 hover:border-gray-950 transition-all uppercase cursor-pointer text-gray-500">RESET</button>
+      </div>
+    </section>
+  }
+
+  <!-- CARGANDO -->
+  @if (cargando) {
+    <div class="grow flex items-center justify-center">
+      <span class="font-mono font-bold text-gray-400 tracking-widest animate-pulse">CARGANDO_AGENDA...</span>
+    </div>
+  }
+
+  <!-- ERROR -->
+  @if (errorCarga && !cargando) {
+    <div class="grow flex flex-col items-center justify-center gap-4">
+      <span class="font-mono font-bold text-red-500 text-sm text-center">{{errorCarga}}</span>
+      <button (click)="cargarCitas()" class="font-mono text-xs font-bold border-2 border-gray-950 px-4 py-2 hover:bg-gray-950 hover:text-white transition-all uppercase cursor-pointer">REINTENTAR</button>
+    </div>
+  }
+
+  <!-- ======================== VISTA LISTA ======================== -->
+  @if (vistaActual === 'lista' && !cargando && !errorCarga) {
+    <div class="grow overflow-auto border-2 border-gray-950 bg-white">
+      <table class="w-full text-left border-collapse min-w-[900px]">
+        <thead class="sticky top-0 bg-gray-200 border-b-2 border-gray-950 z-10">
+          <tr class="text-[10px] text-gray-900 uppercase font-black tracking-tight">
+            <th class="p-2 w-36 border-r border-gray-300">Fecha</th>
+            <th class="p-2 w-20 border-r border-gray-300">Hora</th>
+            <th class="p-2 w-64 border-r border-gray-300">Cliente</th>
+            <th class="p-2 border-r border-gray-300">Motivo</th>
+            <th class="p-2 w-24 border-r border-gray-300 text-center">Duración</th>
+            <th class="p-2 w-32 border-r border-gray-300 text-center">Estado</th>
+            <th class="p-2 w-24 text-right px-4">Acción</th>
+          </tr>
+        </thead>
+        <tbody class="text-[12px] divide-y divide-gray-100">
+          @for (c of citasFiltradas; track c.id) {
+            <tr class="hover:bg-gray-50 transition-colors" [class.opacity-50]="c.estado === 'CANCELADA'">
+              <td class="p-2 font-mono font-bold border-r border-gray-50">{{c.fecha}}</td>
+              <td class="p-2 font-mono font-bold text-blue-600 border-r border-gray-50">{{c.hora}}</td>
+              <td class="p-2 font-bold border-r border-gray-50">{{c.clienteNombre}}</td>
+              <td class="p-2 text-gray-600 border-r border-gray-50 truncate max-w-[280px]">{{c.motivo}}</td>
+              <td class="p-2 font-mono text-center border-r border-gray-50 text-gray-500">{{c.duracion}}min</td>
+              <td class="p-2 border-r border-gray-50 text-center">
+                <span class="px-2 py-0.5 text-[9px] font-black uppercase tracking-widest" [class]="estadoClass(c.estado)">{{c.estado}}</span>
+              </td>
+              <td class="p-2 text-right px-4">
+                <button (click)="verCita(c)" class="border border-gray-950 px-3 py-1 text-[9px] font-black uppercase hover:bg-gray-950 hover:text-white transition-all cursor-pointer">Ver</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="p-8 text-center font-mono text-gray-400 text-xs">SIN_RESULTADOS</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <footer class="shrink-0 pt-3 font-mono text-[9px] font-black text-gray-300 uppercase">
+      Results: {{citasFiltradas.length}} // Total_Agenda: {{citas.length}}
+    </footer>
+  }
+
+  <!-- ======================== VISTA SEMANA ======================== -->
+  @if (vistaActual === 'semana' && !cargando && !errorCarga) {
+    <!-- Nav semana -->
+    <div class="shrink-0 flex items-center justify-between mb-3 px-1">
+      <button (click)="prevSemana()" class="font-mono text-[10px] font-black border-2 border-gray-950 px-3 py-1.5 hover:bg-gray-950 hover:text-white transition-all uppercase cursor-pointer">
+        &lt; ANT
+      </button>
+      <div class="flex items-center gap-4">
+        <button (click)="irAHoy()" class="font-mono text-[10px] font-black border-2 border-blue-500 text-blue-600 px-3 py-1.5 hover:bg-blue-500 hover:text-white transition-all uppercase cursor-pointer">
+          HOY
+        </button>
+        <span class="font-black text-sm uppercase tracking-tight">{{tituloSemana}}</span>
+      </div>
+      <button (click)="nextSemana()" class="font-mono text-[10px] font-black border-2 border-gray-950 px-3 py-1.5 hover:bg-gray-950 hover:text-white transition-all uppercase cursor-pointer">
+        SIG &gt;
+      </button>
+    </div>
+
+    <!-- Grid semanal -->
+    <div class="grow overflow-auto border-2 border-gray-950 bg-white">
+      <table class="border-collapse w-full">
+        <!-- Cabecera días -->
+        <thead class="sticky top-0 z-10">
+          <tr>
+            <th class="w-14 bg-gray-200 border-b-2 border-r-2 border-gray-950 p-2"></th>
+            @for (dia of diasSemanaActual; track dia.getTime()) {
+              <th class="border-b-2 border-r border-gray-200 p-2 text-center min-w-[120px]"
+                [class.bg-blue-50]="isToday(dia)"
+                [class.bg-gray-200]="!isToday(dia)"
+                [class.border-r-2]="$last"
+                [class.border-gray-950]="$last">
+                <span class="block font-mono text-[9px] font-black text-gray-400 uppercase tracking-widest">{{DIAS_SEMANA[$index]}}</span>
+                <span class="font-black text-xl leading-none"
+                  [class.text-blue-600]="isToday(dia)"
+                  [class.text-gray-950]="!isToday(dia)">
+                  {{dia.getDate()}}
+                </span>
+              </th>
+            }
+          </tr>
+        </thead>
+        <!-- Slots horarios -->
+        <tbody>
+          @for (hora of horasSlots; track hora) {
+            <tr class="border-b border-gray-100">
+              <td class="border-r-2 border-gray-950 px-1 text-[9px] font-mono font-black text-gray-300 align-top pt-1 w-14 bg-gray-50">
+                {{hora}}
+              </td>
+              @for (dia of diasSemanaActual; track dia.getTime()) {
+                <td class="border-r border-gray-100 p-1 align-top h-12"
+                  [class.bg-blue-50]="isToday(dia) && citasParaSlot(dia, hora).length === 0"
+                  [class.bg-blue-50]="isToday(dia)">
+                  @for (cita of citasParaSlot(dia, hora); track cita.id) {
+                    <button (click)="verCita(cita)"
+                      class="w-full text-left text-[9px] font-bold px-1.5 py-1 mb-0.5 block truncate cursor-pointer transition-colors"
+                      [class]="citaCardClass(cita.estado)">
+                      <span class="font-mono">{{cita.hora}}</span> {{cita.clienteNombre}}
+                    </button>
+                  }
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <!-- ======================== VISTA MES ======================== -->
+  @if (vistaActual === 'mes' && !cargando && !errorCarga) {
+    <!-- Nav mes -->
+    <div class="shrink-0 flex items-center justify-between mb-3 px-1">
+      <button (click)="prevMes()" class="font-mono text-[10px] font-black border-2 border-gray-950 px-3 py-1.5 hover:bg-gray-950 hover:text-white transition-all uppercase cursor-pointer">
+        &lt; ANT
+      </button>
+      <div class="flex items-center gap-4">
+        <button (click)="irAHoy()" class="font-mono text-[10px] font-black border-2 border-blue-500 text-blue-600 px-3 py-1.5 hover:bg-blue-500 hover:text-white transition-all uppercase cursor-pointer">
+          HOY
+        </button>
+        <span class="font-black text-lg uppercase tracking-tight">{{tituloMes}}</span>
+      </div>
+      <button (click)="nextMes()" class="font-mono text-[10px] font-black border-2 border-gray-950 px-3 py-1.5 hover:bg-gray-950 hover:text-white transition-all uppercase cursor-pointer">
+        SIG &gt;
+      </button>
+    </div>
+
+    <!-- Grid mensual -->
+    <div class="grow overflow-auto border-2 border-gray-950 bg-white flex flex-col">
+      <!-- Cabecera días de la semana -->
+      <div class="grid grid-cols-7 border-b-2 border-gray-950 shrink-0">
+        @for (dia of DIAS_SEMANA; track dia) {
+          <div class="p-2 text-center font-mono text-[10px] font-black text-gray-400 uppercase tracking-widest border-r border-gray-200 last:border-r-0 bg-gray-100">
+            {{dia}}
+          </div>
+        }
+      </div>
+      <!-- Semanas -->
+      <div class="grow grid" [style.grid-template-rows]="'repeat(' + semanasMes.length + ', 1fr)'">
+        @for (semana of semanasMes; track $index) {
+          <div class="grid grid-cols-7 border-b border-gray-200 last:border-b-0">
+            @for (dia of semana; track dia.getTime()) {
+              <div class="border-r border-gray-200 last:border-r-0 p-1.5 flex flex-col min-h-[90px]"
+                [class.bg-gray-50]="!isCurrentMonth(dia)"
+                [class.bg-white]="isCurrentMonth(dia)">
+                <!-- Número del día -->
+                <button (click)="seleccionarDia(dia)"
+                  class="font-mono font-black text-xs mb-1 w-6 h-6 flex items-center justify-center transition-colors cursor-pointer"
+                  [class.bg-blue-600]="isToday(dia)"
+                  [class.text-white]="isToday(dia)"
+                  [class.text-gray-950]="isCurrentMonth(dia) && !isToday(dia)"
+                  [class.text-gray-300]="!isCurrentMonth(dia)">
+                  {{dia.getDate()}}
+                </button>
+                <!-- Citas del día (máx 3 visibles) -->
+                @for (cita of citasParaDia(dia).slice(0, 3); track cita.id) {
+                  <button (click)="verCita(cita)"
+                    class="w-full text-left text-[8px] font-bold px-1.5 py-0.5 mb-0.5 block truncate cursor-pointer transition-colors"
+                    [class]="citaCardClass(cita.estado)">
+                    {{cita.hora}} {{cita.clienteNombre}}
+                  </button>
+                }
+                <!-- Más citas -->
+                @if (citasParaDia(dia).length > 3) {
+                  <button (click)="seleccionarDia(dia)" class="text-[8px] font-mono font-bold text-gray-400 hover:text-gray-700 cursor-pointer text-left mt-0.5">
+                    +{{citasParaDia(dia).length - 3}} más
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+</div>
+
+
+<!-- ======================== MODAL VER / EDITAR CITA ======================== -->
+@if (citaSeleccionada) {
+  <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+    <div class="bg-gray-100 border-4 border-gray-950 w-full max-w-xl max-h-[90vh] overflow-y-auto flex flex-col">
+
+      <div class="flex items-start justify-between border-b-4 border-gray-950 p-6 pb-4 shrink-0">
+        <div>
+          <span class="font-mono text-[10px] text-blue-600 font-black tracking-widest block mb-1">CITA_REGISTRO #{{citaSeleccionada.id}}</span>
+          <h2 class="text-3xl font-black tracking-tighter uppercase">{{citaSeleccionada.clienteNombre}}</h2>
+        </div>
+        <button (click)="cerrarModal()" class="font-mono font-bold text-gray-400 hover:text-gray-950 text-sm tracking-widest cursor-pointer ml-4">[ X ]</button>
+      </div>
+
+      @if (!modoEdicion) {
+        <div class="p-6 grid grid-cols-2 gap-x-8 gap-y-5 grow">
+          <div>
+            <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Fecha</span>
+            <span class="font-mono font-bold text-sm">{{citaSeleccionada.fecha}}</span>
+          </div>
+          <div>
+            <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Hora</span>
+            <span class="font-mono font-bold text-lg text-blue-600">{{citaSeleccionada.hora}}</span>
+          </div>
+          <div>
+            <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Duración</span>
+            <span class="font-mono font-bold text-sm">{{citaSeleccionada.duracion}} minutos</span>
+          </div>
+          <div>
+            <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Estado</span>
+            <span class="px-2 py-0.5 text-[9px] font-black uppercase tracking-widest" [class]="estadoClass(citaSeleccionada.estado)">{{citaSeleccionada.estado}}</span>
+          </div>
+          <div class="col-span-2">
+            <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Motivo</span>
+            <span class="font-bold text-sm">{{citaSeleccionada.motivo}}</span>
+          </div>
+        </div>
+      }
+
+      @if (modoEdicion) {
+        <div class="p-6 grid grid-cols-2 gap-x-8 gap-y-4 grow">
+          <div class="border-b-2 border-gray-950">
+            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Fecha</label>
+            <input [(ngModel)]="citaEditando.fecha" type="date" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
+          </div>
+          <div class="border-b-2 border-gray-950">
+            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Hora</label>
+            <input [(ngModel)]="citaEditando.hora" type="time" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
+          </div>
+          <div class="border-b-2 border-gray-950">
+            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Duración (min)</label>
+            <select [(ngModel)]="citaEditando.duracion" class="w-full bg-transparent outline-none py-1 text-sm font-bold cursor-pointer">
+              @for (d of duraciones; track d) {
+                <option [value]="d">{{d}} min</option>
+              }
+            </select>
+          </div>
+          <div class="border-b-2 border-gray-950">
+            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Estado</label>
+            <select [(ngModel)]="citaEditando.estado" class="w-full bg-transparent outline-none py-1 text-sm font-bold cursor-pointer">
+              @for (e of estados; track e) {
+                <option [value]="e">{{e}}</option>
+              }
+            </select>
+          </div>
+          <div class="col-span-2 border-b-2 border-gray-950">
+            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Motivo</label>
+            <input [(ngModel)]="citaEditando.motivo" class="w-full bg-transparent outline-none py-1 text-sm font-bold">
+          </div>
+        </div>
+      }
+
+      @if (errorModal) {
+        <div class="px-6 pb-2">
+          <span class="font-mono text-xs text-red-500 font-bold">ERROR: {{errorModal}}</span>
+        </div>
+      }
+
+      <div class="border-t-4 border-gray-950 p-4 flex gap-3 shrink-0">
+        @if (!modoEdicion) {
+          <button (click)="iniciarEdicion()" class="px-6 py-2 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all cursor-pointer">EDITAR</button>
+          @if (citaSeleccionada.estado === 'PENDIENTE') {
+            <button (click)="cancelarCita(citaSeleccionada)" class="px-6 py-2 font-black text-xs uppercase border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white transition-all cursor-pointer">CANCELAR_CITA</button>
+          }
+        }
+        @if (modoEdicion) {
+          <button (click)="guardarCambios()" [disabled]="guardando" class="px-6 py-2 font-black text-xs uppercase bg-gray-950 text-white hover:bg-blue-600 transition-all cursor-pointer disabled:opacity-50">
+            {{guardando ? 'GUARDANDO...' : 'GUARDAR_CAMBIOS'}}
+          </button>
+          <button (click)="cancelarEdicion()" class="px-6 py-2 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all cursor-pointer">CANCELAR</button>
+        }
+      </div>
+
+    </div>
+  </div>
+}
+
+
+<!-- ======================== MODAL NUEVA CITA ======================== -->
+@if (mostrarNueva) {
+  <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+    <div class="bg-gray-100 border-4 border-gray-950 w-full max-w-xl max-h-[90vh] overflow-y-auto flex flex-col">
+
+      <div class="flex items-center justify-between border-b-4 border-gray-950 p-6 pb-4 shrink-0">
+        <div>
+          <span class="font-mono text-[10px] text-blue-600 font-black tracking-widest block mb-1">NUEVA_CITA</span>
+          <h2 class="text-3xl font-black tracking-tighter uppercase">Registrar Cita</h2>
+        </div>
+        <button (click)="cerrarNueva()" class="font-mono font-bold text-gray-400 hover:text-gray-950 text-sm tracking-widest cursor-pointer ml-4">[ X ]</button>
+      </div>
+
+      <div class="p-6 flex flex-col gap-5 grow">
+
+        <!-- Buscador de cliente -->
+        <div class="relative">
+          <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Cliente *</label>
+          <div class="border-b-2 border-gray-950">
+            <input [(ngModel)]="busquedaCliente" (input)="onBusquedaCliente()"
+              placeholder="Buscar por nombre, apellidos o DNI..."
+              class="w-full bg-transparent outline-none py-1 text-sm font-bold">
+          </div>
+          @if (clientesFiltrados.length > 0) {
+            <div class="absolute z-10 w-full bg-white border-2 border-gray-950 border-t-0 max-h-40 overflow-y-auto">
+              @for (cli of clientesFiltrados; track cli.id) {
+                <button (click)="seleccionarCliente(cli)" class="w-full text-left px-4 py-2 text-xs font-bold hover:bg-gray-950 hover:text-white transition-all border-b border-gray-100 cursor-pointer">
+                  {{cli.nombre}} {{cli.apellidos}} <span class="text-gray-400 font-mono">— {{cli.dni}}</span>
+                </button>
+              }
+            </div>
+          }
+          @if (clienteElegido) {
+            <span class="font-mono text-[10px] text-green-600 font-bold mt-1 block">CLIENTE_OK: #{{clienteElegido.id}}</span>
+          }
+        </div>
+
+        <div class="grid grid-cols-2 gap-x-8 gap-y-4">
+          <div class="border-b-2 border-gray-950">
+            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Fecha *</label>
+            <input [(ngModel)]="nuevaCita.fecha" type="date" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
+          </div>
+          <div class="border-b-2 border-gray-950">
+            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Hora *</label>
+            <input [(ngModel)]="nuevaCita.hora" type="time" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
+          </div>
+          <div class="border-b-2 border-gray-950">
+            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Duración</label>
+            <select [(ngModel)]="nuevaCita.duracion" class="w-full bg-transparent outline-none py-1 text-sm font-bold cursor-pointer">
+              @for (d of duraciones; track d) {
+                <option [value]="d">{{d}} min</option>
+              }
+            </select>
+          </div>
+          <div class="col-span-2 border-b-2 border-gray-950">
+            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Motivo *</label>
+            <input [(ngModel)]="nuevaCita.motivo" class="w-full bg-transparent outline-none py-1 text-sm font-bold" placeholder="Revisión anual, adaptación lentillas...">
+          </div>
+        </div>
+      </div>
+
+      @if (errorNueva) {
+        <div class="px-6 pb-2">
+          <span class="font-mono text-xs text-red-500 font-bold">ERROR: {{errorNueva}}</span>
+        </div>
+      }
+
+      <div class="border-t-4 border-gray-950 p-4 flex gap-3 shrink-0">
+        <button (click)="crearCita()" [disabled]="creando" class="px-6 py-2 font-black text-xs uppercase bg-gray-950 text-white hover:bg-blue-600 transition-all cursor-pointer disabled:opacity-50">
+          {{creando ? 'REGISTRANDO...' : 'REGISTRAR_CITA'}}
+        </button>
+        <button (click)="cerrarNueva()" class="px-6 py-2 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all cursor-pointer">CANCELAR</button>
+      </div>
+
+    </div>
+  </div>
+}

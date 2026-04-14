@@ -1,0 +1,306 @@
+<div class="h-screen w-screen bg-gray-100 text-gray-950 p-6 flex flex-col overflow-hidden font-sans border-[3px] border-gray-950 box-border">
+
+  <header class="shrink-0 flex items-center justify-between border-b-2 border-gray-950 pb-3 mb-4">
+    <div class="flex items-center gap-6">
+      <button (click)="volverAlMenu()" class="font-mono text-xs font-bold text-gray-400 hover:text-gray-950 border-b-2 border-transparent hover:border-gray-950 transition-colors uppercase tracking-widest cursor-pointer">
+        &lt; MENU
+      </button>
+      <div>
+        <h1 class="text-5xl font-black tracking-tighter uppercase italic text-gray-950">Inventario<span class="text-gray-400">_</span></h1>
+        <p class="text-[9px] font-mono font-bold text-gray-400 tracking-widest leading-none mt-1 uppercase">
+          TOTAL: {{totalArticulos}} // AGOTADOS: <span class="text-red-500">{{articulosAgotados}}</span> // STOCK_BAJO: <span class="text-orange-400">{{articulosStockBajo}}</span>
+        </p>
+      </div>
+    </div>
+    <button (click)="abrirNuevo()" class="bg-white text-gray-950 px-6 py-2.5 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 cursor-pointer">
+      + NUEVO_ARTÍCULO
+    </button>
+  </header>
+
+  <!-- Tabs de categoría + filtro nombre -->
+  <section class="shrink-0 flex items-end justify-between mb-4">
+    <div class="flex gap-0 border-2 border-gray-950">
+      @for (tab of [{ value: 'TODOS', label: 'TODOS' }, { value: 'MONTURA', label: 'MONTURAS' }, { value: 'GAFA_SOL', label: 'GAFAS_SOL' }, { value: 'LIQUIDO', label: 'LÍQUIDOS' }]; track tab.value) {
+        <button
+          (click)="setCategoriaActiva(tab.value)"
+          class="px-5 py-2 text-[10px] font-black uppercase tracking-widest transition-all cursor-pointer border-r-2 border-gray-950 last:border-r-0"
+          [class.bg-gray-950]="categoriaActiva === tab.value"
+          [class.text-white]="categoriaActiva === tab.value"
+          [class.text-gray-500]="categoriaActiva !== tab.value"
+          [class.hover:bg-gray-200]="categoriaActiva !== tab.value">
+          {{tab.label}}
+        </button>
+      }
+    </div>
+    <div class="border-l-4 border-gray-950 pl-4">
+      <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Buscar</label>
+      <input [(ngModel)]="filtroNombre" (input)="currentPage=1; aplicarFiltros()" type="text" placeholder="Nombre, marca o referencia..." class="bg-transparent outline-none py-1 text-sm font-bold w-60">
+    </div>
+  </section>
+
+  <!-- Cargando -->
+  @if (cargando) {
+    <div class="grow flex items-center justify-center">
+      <span class="font-mono font-bold text-gray-400 tracking-widest animate-pulse">CARGANDO_INVENTARIO...</span>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (errorCarga && !cargando) {
+    <div class="grow flex flex-col items-center justify-center gap-4">
+      <span class="font-mono font-bold text-red-500 text-sm text-center">{{errorCarga}}</span>
+      <button (click)="cargarArticulos()" class="font-mono text-xs font-bold border-2 border-gray-950 px-4 py-2 hover:bg-gray-950 hover:text-white transition-all uppercase cursor-pointer">
+        REINTENTAR
+      </button>
+    </div>
+  }
+
+  <!-- Tabla -->
+  @if (!cargando && !errorCarga) {
+    <div class="grow overflow-auto border-2 border-gray-950 bg-white">
+      <table class="w-full text-left border-collapse min-w-[900px]">
+        <thead class="sticky top-0 bg-gray-200 border-b-2 border-gray-950 z-10">
+          <tr class="text-[10px] text-gray-900 uppercase font-black tracking-tight">
+            <th class="p-2 w-12 border-r border-gray-300 text-center text-gray-400">ID</th>
+            <th class="p-2 w-28 border-r border-gray-300">Referencia</th>
+            <th class="p-2 border-r border-gray-300">Nombre / Marca</th>
+            <th class="p-2 w-28 border-r border-gray-300 text-center">Categoría</th>
+            <th class="p-2 w-24 border-r border-gray-300 text-center">Stock</th>
+            <th class="p-2 w-24 border-r border-gray-300 text-right pr-4">Precio</th>
+            <th class="p-2 w-24 text-right px-4">Acción</th>
+          </tr>
+        </thead>
+        <tbody class="text-[12px] divide-y divide-gray-100">
+          @for (a of articulosPaginados; track a.id) {
+            <tr class="hover:bg-gray-50 transition-colors">
+              <td class="p-2 font-mono text-[10px] text-gray-400 border-r border-gray-50 text-center">#{{a.id}}</td>
+              <td class="p-2 font-mono text-xs font-bold tracking-tighter border-r border-gray-50">{{a.referencia}}</td>
+              <td class="p-2 border-r border-gray-50">
+                <span class="font-bold text-gray-950">{{a.nombre}}</span>
+                <span class="text-gray-400 text-[11px] ml-2">{{a.marca}}</span>
+              </td>
+              <td class="p-2 border-r border-gray-50 text-center">
+                <span class="font-mono text-[9px] font-black uppercase tracking-widest bg-gray-100 px-2 py-0.5 border border-gray-300">
+                  {{categoriaLabel(a.categoria)}}
+                </span>
+              </td>
+              <td class="p-2 border-r border-gray-50 text-center" [class]="stockClass(a.stock)">
+                {{a.stock <= 0 ? 'AGOTADO' : a.stock}}
+              </td>
+              <td class="p-2 border-r border-gray-50 font-mono font-bold text-right pr-4">{{a.precio | number:'1.2-2'}}€</td>
+              <td class="p-2 text-right px-4">
+                <button (click)="verArticulo(a)" class="bg-transparent border border-gray-950 px-3 py-1 text-[9px] font-black uppercase hover:bg-gray-950 hover:text-white transition-all cursor-pointer">
+                  Ver
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="p-8 text-center font-mono text-gray-400 text-xs">SIN_RESULTADOS</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <footer class="shrink-0 flex items-center justify-between pt-4 font-mono">
+      <div class="text-[9px] font-black text-gray-300 uppercase">
+        Results: {{articulosFiltrados.length}}
+      </div>
+      <div class="flex items-center border-2 border-gray-950 bg-white">
+        <button (click)="prevPage()" [disabled]="currentPage === 1"
+                class="px-4 py-1.5 text-[10px] font-black hover:bg-gray-950 hover:text-white disabled:opacity-20 border-r-2 border-gray-950 transition-all uppercase cursor-pointer">
+          &lt;&lt; Prev
+        </button>
+        <div class="px-6 py-1.5 text-[10px] font-black bg-gray-100 flex items-center gap-3">
+          <span class="text-gray-400 font-bold">PAG_</span>
+          <span class="text-sm font-black">{{currentPage}}</span>
+          <span class="text-gray-400">/</span>
+          <span class="font-bold">{{totalPages}}</span>
+        </div>
+        <button (click)="nextPage()" [disabled]="currentPage === totalPages"
+                class="px-4 py-1.5 text-[10px] font-black hover:bg-gray-950 hover:text-white disabled:opacity-20 border-l-2 border-gray-950 transition-all uppercase cursor-pointer">
+          Next &gt;&gt;
+        </button>
+      </div>
+    </footer>
+  }
+</div>
+
+
+<!-- ======================== MODAL VER / EDITAR ARTÍCULO ======================== -->
+@if (articuloSeleccionado) {
+  <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+    <div class="bg-gray-100 border-4 border-gray-950 w-full max-w-xl max-h-[90vh] overflow-y-auto flex flex-col">
+
+      <div class="flex items-start justify-between border-b-4 border-gray-950 p-6 pb-4 shrink-0">
+        <div>
+          <span class="font-mono text-[10px] text-blue-600 font-black tracking-widest block mb-1">ARTÍCULO #{{articuloSeleccionado.id}} — {{categoriaLabel(articuloSeleccionado.categoria)}}</span>
+          <h2 class="text-3xl font-black tracking-tighter uppercase">{{articuloSeleccionado.nombre}}</h2>
+          <span class="font-mono text-xs text-gray-500">{{articuloSeleccionado.marca}}</span>
+        </div>
+        <button (click)="cerrarModal()" class="font-mono font-bold text-gray-400 hover:text-gray-950 text-sm tracking-widest cursor-pointer ml-4">[ X ]</button>
+      </div>
+
+      @if (!modoEdicion) {
+        <div class="p-6 grid grid-cols-2 gap-x-8 gap-y-5 grow">
+          <div>
+            <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Referencia</span>
+            <span class="font-mono font-bold text-sm">{{articuloSeleccionado.referencia}}</span>
+          </div>
+          <div>
+            <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Categoría</span>
+            <span class="font-bold text-sm">{{categoriaLabel(articuloSeleccionado.categoria)}}</span>
+          </div>
+          <div>
+            <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Stock</span>
+            <span class="font-mono text-lg" [class]="stockClass(articuloSeleccionado.stock)">
+              {{articuloSeleccionado.stock <= 0 ? 'AGOTADO' : articuloSeleccionado.stock + ' uds.'}}
+            </span>
+          </div>
+          <div>
+            <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Precio</span>
+            <span class="font-mono font-bold text-sm">{{articuloSeleccionado.precio | number:'1.2-2'}}€</span>
+          </div>
+          @if (articuloSeleccionado.descripcion) {
+            <div class="col-span-2">
+              <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Descripción</span>
+              <span class="text-sm text-gray-600">{{articuloSeleccionado.descripcion}}</span>
+            </div>
+          }
+        </div>
+      }
+
+      @if (modoEdicion) {
+        <div class="p-6 grid grid-cols-2 gap-x-8 gap-y-4 grow">
+          <div class="border-b-2 border-gray-950">
+            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Nombre</label>
+            <input [(ngModel)]="articuloEditando.nombre" class="w-full bg-transparent outline-none py-1 text-sm font-bold">
+          </div>
+          <div class="border-b-2 border-gray-950">
+            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Referencia</label>
+            <input [(ngModel)]="articuloEditando.referencia" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
+          </div>
+          <div class="border-b-2 border-gray-950">
+            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Marca</label>
+            <input [(ngModel)]="articuloEditando.marca" class="w-full bg-transparent outline-none py-1 text-sm font-bold">
+          </div>
+          <div class="border-b-2 border-gray-950">
+            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Categoría</label>
+            <select [(ngModel)]="articuloEditando.categoria" class="w-full bg-transparent outline-none py-1 text-sm font-bold cursor-pointer">
+              @for (cat of categorias; track cat.value) {
+                <option [value]="cat.value">{{cat.label}}</option>
+              }
+            </select>
+          </div>
+          <div class="border-b-2 border-gray-950">
+            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Stock</label>
+            <input [(ngModel)]="articuloEditando.stock" type="number" min="0" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
+          </div>
+          <div class="border-b-2 border-gray-950">
+            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Precio (€)</label>
+            <input [(ngModel)]="articuloEditando.precio" type="number" step="0.01" min="0" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
+          </div>
+          <div class="col-span-2 border-b-2 border-gray-950">
+            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Descripción</label>
+            <input [(ngModel)]="articuloEditando.descripcion" class="w-full bg-transparent outline-none py-1 text-sm">
+          </div>
+        </div>
+      }
+
+      @if (errorModal) {
+        <div class="px-6 pb-2">
+          <span class="font-mono text-xs text-red-500 font-bold">ERROR: {{errorModal}}</span>
+        </div>
+      }
+
+      <div class="border-t-4 border-gray-950 p-4 flex gap-3 shrink-0">
+        @if (!modoEdicion) {
+          <button (click)="iniciarEdicion()" class="px-6 py-2 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all cursor-pointer">
+            EDITAR
+          </button>
+          <button (click)="eliminarArticulo(articuloSeleccionado)" class="px-6 py-2 font-black text-xs uppercase border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white transition-all cursor-pointer">
+            ELIMINAR
+          </button>
+        }
+        @if (modoEdicion) {
+          <button (click)="guardarCambios()" [disabled]="guardando" class="px-6 py-2 font-black text-xs uppercase bg-gray-950 text-white hover:bg-blue-600 transition-all cursor-pointer disabled:opacity-50">
+            {{guardando ? 'GUARDANDO...' : 'GUARDAR_CAMBIOS'}}
+          </button>
+          <button (click)="cancelarEdicion()" class="px-6 py-2 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all cursor-pointer">
+            CANCELAR
+          </button>
+        }
+      </div>
+
+    </div>
+  </div>
+}
+
+
+<!-- ======================== MODAL NUEVO ARTÍCULO ======================== -->
+@if (mostrarNuevo) {
+  <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+    <div class="bg-gray-100 border-4 border-gray-950 w-full max-w-xl max-h-[90vh] overflow-y-auto flex flex-col">
+
+      <div class="flex items-center justify-between border-b-4 border-gray-950 p-6 pb-4 shrink-0">
+        <div>
+          <span class="font-mono text-[10px] text-blue-600 font-black tracking-widest block mb-1">ALTA_INVENTARIO</span>
+          <h2 class="text-3xl font-black tracking-tighter uppercase">Nuevo Artículo</h2>
+        </div>
+        <button (click)="cerrarNuevo()" class="font-mono font-bold text-gray-400 hover:text-gray-950 text-sm tracking-widest cursor-pointer ml-4">[ X ]</button>
+      </div>
+
+      <div class="p-6 grid grid-cols-2 gap-x-8 gap-y-4 grow">
+        <div class="border-b-2 border-gray-950">
+          <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Nombre *</label>
+          <input [(ngModel)]="nuevoArticulo.nombre" class="w-full bg-transparent outline-none py-1 text-sm font-bold" placeholder="Nombre del artículo">
+        </div>
+        <div class="border-b-2 border-gray-950">
+          <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Referencia *</label>
+          <input [(ngModel)]="nuevoArticulo.referencia" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold" placeholder="REF-001">
+        </div>
+        <div class="border-b-2 border-gray-950">
+          <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Marca</label>
+          <input [(ngModel)]="nuevoArticulo.marca" class="w-full bg-transparent outline-none py-1 text-sm font-bold" placeholder="Marca">
+        </div>
+        <div class="border-b-2 border-gray-950">
+          <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Categoría</label>
+          <select [(ngModel)]="nuevoArticulo.categoria" class="w-full bg-transparent outline-none py-1 text-sm font-bold cursor-pointer">
+            @for (cat of categorias; track cat.value) {
+              <option [value]="cat.value">{{cat.label}}</option>
+            }
+          </select>
+        </div>
+        <div class="border-b-2 border-gray-950">
+          <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Stock inicial</label>
+          <input [(ngModel)]="nuevoArticulo.stock" type="number" min="0" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
+        </div>
+        <div class="border-b-2 border-gray-950">
+          <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Precio (€)</label>
+          <input [(ngModel)]="nuevoArticulo.precio" type="number" step="0.01" min="0" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
+        </div>
+        <div class="col-span-2 border-b-2 border-gray-950">
+          <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Descripción</label>
+          <input [(ngModel)]="nuevoArticulo.descripcion" class="w-full bg-transparent outline-none py-1 text-sm" placeholder="Descripción opcional">
+        </div>
+      </div>
+
+      @if (errorNuevo) {
+        <div class="px-6 pb-2">
+          <span class="font-mono text-xs text-red-500 font-bold">ERROR: {{errorNuevo}}</span>
+        </div>
+      }
+
+      <div class="border-t-4 border-gray-950 p-4 flex gap-3 shrink-0">
+        <button (click)="crearArticulo()" [disabled]="creando" class="px-6 py-2 font-black text-xs uppercase bg-gray-950 text-white hover:bg-blue-600 transition-all cursor-pointer disabled:opacity-50">
+          {{creando ? 'CREANDO...' : 'AÑADIR_AL_INVENTARIO'}}
+        </button>
+        <button (click)="cerrarNuevo()" class="px-6 py-2 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all cursor-pointer">
+          CANCELAR
+        </button>
+      </div>
+
+    </div>
+  </div>
+}
