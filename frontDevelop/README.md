@@ -56,7 +56,7 @@ La aplicación estará disponible en `http://localhost:4200`.
 
 | Usuario | Contraseña |
 |---------|------------|
-| admin   | admin      |
+| admin   | admin123   |
 
 ---
 

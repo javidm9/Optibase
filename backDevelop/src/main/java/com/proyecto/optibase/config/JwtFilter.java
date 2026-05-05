@@ -1,10 +1,12 @@
 package com.proyecto.optibase.config;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -28,9 +30,16 @@ public class JwtFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
             if (jwtUtil.isTokenValid(token)) {
-                String username = jwtUtil.extractClaims(token).getSubject();
+                Claims claims = jwtUtil.extractClaims(token);
+                String username = claims.getSubject();
+                String rol = claims.get("rol", String.class);
+
+                List<SimpleGrantedAuthority> authorities = (rol != null && !rol.isBlank())
+                        ? List.of(new SimpleGrantedAuthority(rol))
+                        : List.of();
+
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                        username, null, List.of()
+                        username, null, authorities
                 );
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }

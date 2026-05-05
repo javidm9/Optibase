@@ -1,0 +1,16 @@
+# ==============================================================
+# PLANTILLA de configuracion local — NO contiene valores reales
+# Copia este fichero como application-local.properties y rellena
+# con tus credenciales. NUNCA subas application-local.properties al repo.
+# ==============================================================
+
+DB_USER=TU_USUARIO_BBDD
+DB_PASSWORD=TU_CONTRASENYA_AQUI
+DB_URL=jdbc:mysql://localhost:3306/optibase_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+
+JWT_SECRET=TU_CLAVE_JWT_BASE64_MINIMO_32_BYTES
+JWT_EXPIRATION=86400000
+
+CORS_ORIGINS=http://localhost:4200
+
+spring.profiles.active=local
