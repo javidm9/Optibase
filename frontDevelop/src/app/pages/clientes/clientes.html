@@ -7,32 +7,32 @@
       </button>
       <div>
         <h1 class="text-5xl font-black tracking-tighter uppercase italic text-gray-950">Clientes<span class="text-gray-400">_</span></h1>
-        <p class="text-[9px] font-mono font-bold text-gray-400 tracking-widest leading-none mt-1 uppercase">DATABASE_CORE // REGISTROS_TOTALES: {{clientesOriginales.length}}</p>
+        <p class="text-[9px] font-mono font-bold text-gray-400 tracking-widest leading-none mt-1 uppercase">DATABASE CORE // REGISTROS TOTALES: {{clientesOriginales.length}}</p>
       </div>
     </div>
     <button (click)="abrirNuevo()" class="bg-white text-gray-950 px-6 py-2.5 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 cursor-pointer">
-      + NUEVO_Cliente
+      + NUEVO CLIENTE
     </button>
   </header>
 
   <section class="shrink-0 grid grid-cols-1 md:grid-cols-3 gap-8 mb-6 px-2">
     <div class="border-l-4 border-gray-950 pl-4">
-      <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Filtro_Nombre</label>
+      <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Filtro Nombre</label>
       <input [(ngModel)]="filtros.nombre" (input)="currentPage=1; applyFilters()" type="text" placeholder="Filtrar por nombre..." class="w-full bg-transparent outline-none py-1 text-sm font-bold">
     </div>
     <div class="border-l-4 border-gray-950 pl-4">
-      <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Filtro_Apellidos</label>
+      <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Filtro Apellidos</label>
       <input [(ngModel)]="filtros.apellidos" (input)="currentPage=1; applyFilters()" type="text" placeholder="Filtrar por apellidos..." class="w-full bg-transparent outline-none py-1 text-sm font-bold">
     </div>
     <div class="border-l-4 border-gray-950 pl-4">
-      <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Filtro_DNI</label>
+      <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Filtro DNI</label>
       <input [(ngModel)]="filtros.dni" (input)="currentPage=1; applyFilters()" type="text" placeholder="Filtrar por DNI..." class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
     </div>
   </section>
 
   @if (cargando) {
     <div class="grow flex items-center justify-center">
-      <span class="font-mono font-bold text-gray-400 tracking-widest animate-pulse">CARGANDO_REGISTROS...</span>
+      <span class="font-mono font-bold text-gray-400 tracking-widest animate-pulse">Cargando registros...</span>
     </div>
   }
 
@@ -52,9 +52,9 @@
           <tr class="text-[10px] text-gray-900 uppercase font-black tracking-tight">
             <th class="p-2 w-14 border-r border-gray-300 text-center text-gray-400">ID</th>
             <th class="p-2 w-72 border-r border-gray-300 font-bold">Cliente</th>
-            <th class="p-2 w-32 border-r border-gray-300">DNI_Ident</th>
+            <th class="p-2 w-32 border-r border-gray-300">DNI</th>
             <th class="p-2 w-36 border-r border-gray-300">Teléfono</th>
-            <th class="p-2 w-48 border-r border-gray-300 italic">Fecha_Nac (Edad)</th>
+            <th class="p-2 w-48 border-r border-gray-300 italic">Fecha Nac. (Edad)</th>
             <th class="p-2 border-r border-gray-300">Dirección / Localidad</th>
             <th class="p-2 w-28 text-right px-4">Acción</th>
           </tr>
@@ -70,13 +70,13 @@
               <td class="p-2 border-r border-gray-50 text-gray-500 truncate text-[11px]">{{p.direccion}}, {{p.localidad}} <span class="text-[9px]">[{{p.codigoPostal}}]</span></td>
               <td class="p-2 text-right px-4">
                 <button (click)="verFicha(p)" class="bg-transparent border border-gray-950 px-3 py-1 text-[9px] font-black uppercase hover:bg-gray-950 hover:text-white transition-all cursor-pointer">
-                  Ver_Ficha
+                  Ver Ficha
                 </button>
               </td>
             </tr>
           } @empty {
             <tr>
-              <td colspan="7" class="p-8 text-center font-mono text-gray-400 text-xs">SIN_RESULTADOS</td>
+              <td colspan="7" class="p-8 text-center font-mono text-gray-400 text-xs">SIN RESULTADOS</td>
             </tr>
           }
         </tbody>
@@ -93,7 +93,7 @@
           &lt;&lt; Prev
         </button>
         <div class="px-6 py-1.5 text-[10px] font-black bg-gray-100 flex items-center gap-3">
-          <span class="text-gray-400 font-bold">PAG_</span>
+          <span class="text-gray-400 font-bold">PÁG.</span>
           <span class="text-sm font-black">{{currentPage}}</span>
           <span class="text-gray-400">/</span>
           <span class="font-bold">{{totalPages}}</span>
@@ -116,7 +116,7 @@
       <!-- Header -->
       <div class="flex items-start justify-between border-b-4 border-gray-950 p-6 pb-0 shrink-0">
         <div class="pb-4">
-          <span class="font-mono text-[10px] text-blue-600 font-black tracking-widest block mb-1">FICHA_CLIENTE #{{clienteSeleccionado.id}}</span>
+          <span class="font-mono text-[10px] text-blue-600 font-black tracking-widest block mb-1">FICHA CLIENTE #{{clienteSeleccionado.id}}</span>
           <h2 class="text-3xl font-black tracking-tighter uppercase">{{clienteSeleccionado.nombre}} {{clienteSeleccionado.apellidos}}</h2>
         </div>
         <button (click)="cerrarFicha()" class="font-mono font-bold text-gray-400 hover:text-gray-950 text-sm tracking-widest cursor-pointer ml-4 mt-1">[ X ]</button>
@@ -239,10 +239,10 @@
         <div class="p-6 grow flex flex-col gap-4">
 
           <div class="flex items-center justify-between">
-            <span class="font-mono text-[10px] font-black text-gray-400 uppercase tracking-widest">HISTORIAL_CRONOLÓGICO ({{graduaciones.length}} registros)</span>
+            <span class="font-mono text-[10px] font-black text-gray-400 uppercase tracking-widest">HISTORIAL CRONOLÓGICO ({{graduaciones.length}} registros)</span>
             @if (!mostrarFormGraduacion) {
               <button (click)="abrirFormGraduacion()" class="font-mono text-[9px] font-black border-2 border-gray-950 px-3 py-1.5 hover:bg-gray-950 hover:text-white transition-all uppercase cursor-pointer">
-                + NUEVA_GRADUACIÓN
+                + NUEVA GRADUACIÓN
               </button>
             }
           </div>
@@ -250,11 +250,11 @@
           <!-- Formulario nueva graduación -->
           @if (mostrarFormGraduacion) {
             <div class="border-2 border-blue-600 p-4 bg-white">
-              <p class="font-mono text-[9px] font-black text-blue-600 uppercase tracking-widest mb-3">NUEVA_GRADUACIÓN</p>
+              <p class="font-mono text-[9px] font-black text-blue-600 uppercase tracking-widest mb-3">NUEVA GRADUACIÓN</p>
               <div class="grid grid-cols-2 gap-x-6 gap-y-3 mb-4">
                 <div class="col-span-2 border-b-2 border-gray-950">
                   <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Fecha</label>
-                  <input [(ngModel)]="nuevaGraduacion.fecha" type="date" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
+                  <input [(ngModel)]="nuevaGraduacion.fechaRevision" type="date" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
                 </div>
                 <!-- OD -->
                 <div>
@@ -321,9 +321,9 @@
 
           <!-- Lista de graduaciones -->
           @if (cargandoGraduaciones) {
-            <span class="font-mono text-xs text-gray-400 animate-pulse">CARGANDO_HISTORIAL...</span>
+            <span class="font-mono text-xs text-gray-400 animate-pulse">Cargando historial...</span>
           } @else if (graduaciones.length === 0) {
-            <p class="font-mono text-xs text-gray-400 uppercase tracking-widest text-center py-6">SIN_REGISTROS_DE_GRADUACIÓN</p>
+            <p class="font-mono text-xs text-gray-400 uppercase tracking-widest text-center py-6">SIN REGISTROS DE GRADUACIÓN</p>
           } @else {
             <div class="overflow-x-auto">
               <table class="w-full text-left border-collapse min-w-[600px]">
@@ -339,7 +339,7 @@
                 <tbody class="divide-y divide-gray-100 text-[11px]">
                   @for (g of graduaciones; track g.id) {
                     <tr class="hover:bg-gray-50">
-                      <td class="p-2 font-mono font-bold border-r border-gray-100">{{g.fecha}}</td>
+                      <td class="p-2 font-mono font-bold border-r border-gray-100">{{g.fechaRevision}}</td>
                       <td class="p-2 font-mono text-center border-r border-gray-100" colspan="3">
                         <span [class.text-red-500]="g.odEsfera < 0">{{g.odEsfera > 0 ? '+' : ''}}{{g.odEsfera}}</span>
                         / {{g.odCilindro}} / {{g.odEje}}°
@@ -379,7 +379,7 @@
         }
         @if (modoEdicion) {
           <button (click)="guardarCambios()" [disabled]="guardando" class="px-6 py-2 font-black text-xs uppercase bg-gray-950 text-white hover:bg-blue-600 transition-all cursor-pointer disabled:opacity-50">
-            {{guardando ? 'GUARDANDO...' : 'GUARDAR_CAMBIOS'}}
+            {{guardando ? 'GUARDANDO...' : 'GUARDAR CAMBIOS'}}
           </button>
           <button (click)="cancelarEdicion()" class="px-6 py-2 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all cursor-pointer">
             CANCELAR
@@ -460,7 +460,7 @@
 
       <div class="border-t-4 border-gray-950 p-4 flex gap-3 shrink-0">
         <button (click)="crearCliente()" [disabled]="creando" class="px-6 py-2 font-black text-xs uppercase bg-gray-950 text-white hover:bg-blue-600 transition-all cursor-pointer disabled:opacity-50">
-          {{creando ? 'CREANDO...' : 'CREAR_REGISTRO'}}
+          {{creando ? 'CREANDO...' : 'CREAR REGISTRO'}}
         </button>
         <button (click)="cerrarNuevo()" class="px-6 py-2 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all cursor-pointer">
           CANCELAR

@@ -1,7 +1,7 @@
 export interface Graduacion {
   id?: number;
-  clienteId: number;
-  fecha: string;
+  cliente: { id: number };
+  fechaRevision: string;
   // Ojo Derecho
   odEsfera: number;
   odCilindro: number;

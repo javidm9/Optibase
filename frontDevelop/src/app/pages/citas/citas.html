@@ -9,7 +9,7 @@
       <div>
         <h1 class="text-5xl font-black tracking-tighter uppercase italic text-gray-950">Agenda<span class="text-gray-400">_</span></h1>
         <p class="text-[9px] font-mono font-bold text-gray-400 tracking-widest leading-none mt-1 uppercase">
-          CITAS_HOY: {{citasHoy}} // PENDIENTES_TOTAL: {{citasPendientes}}
+          CITAS HOY: {{citasHoy}} // PENDIENTES TOTAL: {{citasPendientes}}
         </p>
       </div>
     </div>
@@ -39,7 +39,7 @@
         </button>
       </div>
       <button (click)="abrirNueva()" class="bg-white text-gray-950 px-6 py-2.5 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 cursor-pointer">
-        + NUEVA_CITA
+        + NUEVA CITA
       </button>
     </div>
   </header>
@@ -48,11 +48,11 @@
   @if (vistaActual === 'lista') {
     <section class="shrink-0 flex flex-wrap items-end gap-6 mb-4 px-2">
       <div class="border-l-4 border-gray-950 pl-4">
-        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Filtro_Cliente</label>
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Filtro Cliente</label>
         <input [(ngModel)]="filtroCliente" (input)="aplicarFiltros()" type="text" placeholder="Nombre..." class="bg-transparent outline-none py-1 text-sm font-bold w-44">
       </div>
       <div class="border-l-4 border-gray-950 pl-4">
-        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Filtro_Estado</label>
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Filtro Estado</label>
         <select [(ngModel)]="filtroEstado" (change)="aplicarFiltros()" class="bg-transparent outline-none py-1 text-sm font-bold cursor-pointer">
           <option value="">Todos</option>
           <option value="PENDIENTE">Pendiente</option>
@@ -61,7 +61,7 @@
         </select>
       </div>
       <div class="border-l-4 border-gray-950 pl-4">
-        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Filtro_Fecha</label>
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Filtro Fecha</label>
         <input [(ngModel)]="filtroFecha" (change)="aplicarFiltros()" type="date" class="bg-transparent outline-none py-1 text-sm font-mono font-bold">
       </div>
       <div class="flex gap-2">
@@ -74,7 +74,7 @@
   <!-- CARGANDO -->
   @if (cargando) {
     <div class="grow flex items-center justify-center">
-      <span class="font-mono font-bold text-gray-400 tracking-widest animate-pulse">CARGANDO_AGENDA...</span>
+      <span class="font-mono font-bold text-gray-400 tracking-widest animate-pulse">Cargando agenda...</span>
     </div>
   }
 
@@ -96,7 +96,6 @@
             <th class="p-2 w-20 border-r border-gray-300">Hora</th>
             <th class="p-2 w-64 border-r border-gray-300">Cliente</th>
             <th class="p-2 border-r border-gray-300">Motivo</th>
-            <th class="p-2 w-24 border-r border-gray-300 text-center">Duración</th>
             <th class="p-2 w-32 border-r border-gray-300 text-center">Estado</th>
             <th class="p-2 w-24 text-right px-4">Acción</th>
           </tr>
@@ -104,11 +103,10 @@
         <tbody class="text-[12px] divide-y divide-gray-100">
           @for (c of citasFiltradas; track c.id) {
             <tr class="hover:bg-gray-50 transition-colors" [class.opacity-50]="c.estado === 'CANCELADA'">
-              <td class="p-2 font-mono font-bold border-r border-gray-50">{{c.fecha}}</td>
-              <td class="p-2 font-mono font-bold text-blue-600 border-r border-gray-50">{{c.hora}}</td>
-              <td class="p-2 font-bold border-r border-gray-50">{{c.clienteNombre}}</td>
+              <td class="p-2 font-mono font-bold border-r border-gray-50">{{fechaCita(c)}}</td>
+              <td class="p-2 font-mono font-bold text-blue-600 border-r border-gray-50">{{horaCita(c)}}</td>
+              <td class="p-2 font-bold border-r border-gray-50">{{nombreCliente(c)}}</td>
               <td class="p-2 text-gray-600 border-r border-gray-50 truncate max-w-[280px]">{{c.motivo}}</td>
-              <td class="p-2 font-mono text-center border-r border-gray-50 text-gray-500">{{c.duracion}}min</td>
               <td class="p-2 border-r border-gray-50 text-center">
                 <span class="px-2 py-0.5 text-[9px] font-black uppercase tracking-widest" [class]="estadoClass(c.estado)">{{c.estado}}</span>
               </td>
@@ -118,14 +116,14 @@
             </tr>
           } @empty {
             <tr>
-              <td colspan="7" class="p-8 text-center font-mono text-gray-400 text-xs">SIN_RESULTADOS</td>
+              <td colspan="6" class="p-8 text-center font-mono text-gray-400 text-xs">SIN RESULTADOS</td>
             </tr>
           }
         </tbody>
       </table>
     </div>
     <footer class="shrink-0 pt-3 font-mono text-[9px] font-black text-gray-300 uppercase">
-      Results: {{citasFiltradas.length}} // Total_Agenda: {{citas.length}}
+      Results: {{citasFiltradas.length}} // Total Agenda: {{citas.length}}
     </footer>
   }
 
@@ -185,7 +183,7 @@
                     <button (click)="verCita(cita)"
                       class="w-full text-left text-[9px] font-bold px-1.5 py-1 mb-0.5 block truncate cursor-pointer transition-colors"
                       [class]="citaCardClass(cita.estado)">
-                      <span class="font-mono">{{cita.hora}}</span> {{cita.clienteNombre}}
+                      <span class="font-mono">{{horaCita(cita)}}</span> {{nombreCliente(cita)}}
                     </button>
                   }
                 </td>
@@ -247,7 +245,7 @@
                   <button (click)="verCita(cita)"
                     class="w-full text-left text-[8px] font-bold px-1.5 py-0.5 mb-0.5 block truncate cursor-pointer transition-colors"
                     [class]="citaCardClass(cita.estado)">
-                    {{cita.hora}} {{cita.clienteNombre}}
+                    {{horaCita(cita)}} {{nombreCliente(cita)}}
                   </button>
                 }
                 <!-- Más citas -->
@@ -274,8 +272,8 @@
 
       <div class="flex items-start justify-between border-b-4 border-gray-950 p-6 pb-4 shrink-0">
         <div>
-          <span class="font-mono text-[10px] text-blue-600 font-black tracking-widest block mb-1">CITA_REGISTRO #{{citaSeleccionada.id}}</span>
-          <h2 class="text-3xl font-black tracking-tighter uppercase">{{citaSeleccionada.clienteNombre}}</h2>
+          <span class="font-mono text-[10px] text-blue-600 font-black tracking-widest block mb-1">CITA REGISTRO #{{citaSeleccionada.id}}</span>
+          <h2 class="text-3xl font-black tracking-tighter uppercase">{{nombreCliente(citaSeleccionada)}}</h2>
         </div>
         <button (click)="cerrarModal()" class="font-mono font-bold text-gray-400 hover:text-gray-950 text-sm tracking-widest cursor-pointer ml-4">[ X ]</button>
       </div>
@@ -284,15 +282,15 @@
         <div class="p-6 grid grid-cols-2 gap-x-8 gap-y-5 grow">
           <div>
             <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Fecha</span>
-            <span class="font-mono font-bold text-sm">{{citaSeleccionada.fecha}}</span>
+            <span class="font-mono font-bold text-sm">{{fechaCita(citaSeleccionada)}}</span>
           </div>
           <div>
             <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Hora</span>
-            <span class="font-mono font-bold text-lg text-blue-600">{{citaSeleccionada.hora}}</span>
+            <span class="font-mono font-bold text-lg text-blue-600">{{horaCita(citaSeleccionada)}}</span>
           </div>
           <div>
-            <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Duración</span>
-            <span class="font-mono font-bold text-sm">{{citaSeleccionada.duracion}} minutos</span>
+            <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Cliente</span>
+            <span class="font-bold text-sm">{{nombreCliente(citaSeleccionada)}}</span>
           </div>
           <div>
             <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Estado</span>
@@ -309,19 +307,11 @@
         <div class="p-6 grid grid-cols-2 gap-x-8 gap-y-4 grow">
           <div class="border-b-2 border-gray-950">
             <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Fecha</label>
-            <input [(ngModel)]="citaEditando.fecha" type="date" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
+            <input [(ngModel)]="editandoFecha" type="date" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
           </div>
           <div class="border-b-2 border-gray-950">
             <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Hora</label>
-            <input [(ngModel)]="citaEditando.hora" type="time" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
-          </div>
-          <div class="border-b-2 border-gray-950">
-            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Duración (min)</label>
-            <select [(ngModel)]="citaEditando.duracion" class="w-full bg-transparent outline-none py-1 text-sm font-bold cursor-pointer">
-              @for (d of duraciones; track d) {
-                <option [value]="d">{{d}} min</option>
-              }
-            </select>
+            <input [(ngModel)]="editandoHora" type="time" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
           </div>
           <div class="border-b-2 border-gray-950">
             <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Estado</label>
@@ -348,12 +338,12 @@
         @if (!modoEdicion) {
           <button (click)="iniciarEdicion()" class="px-6 py-2 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all cursor-pointer">EDITAR</button>
           @if (citaSeleccionada.estado === 'PENDIENTE') {
-            <button (click)="cancelarCita(citaSeleccionada)" class="px-6 py-2 font-black text-xs uppercase border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white transition-all cursor-pointer">CANCELAR_CITA</button>
+            <button (click)="cancelarCita(citaSeleccionada)" class="px-6 py-2 font-black text-xs uppercase border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white transition-all cursor-pointer">CANCELAR CITA</button>
           }
         }
         @if (modoEdicion) {
           <button (click)="guardarCambios()" [disabled]="guardando" class="px-6 py-2 font-black text-xs uppercase bg-gray-950 text-white hover:bg-blue-600 transition-all cursor-pointer disabled:opacity-50">
-            {{guardando ? 'GUARDANDO...' : 'GUARDAR_CAMBIOS'}}
+            {{guardando ? 'GUARDANDO...' : 'GUARDAR CAMBIOS'}}
           </button>
           <button (click)="cancelarEdicion()" class="px-6 py-2 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all cursor-pointer">CANCELAR</button>
         }
@@ -371,7 +361,7 @@
 
       <div class="flex items-center justify-between border-b-4 border-gray-950 p-6 pb-4 shrink-0">
         <div>
-          <span class="font-mono text-[10px] text-blue-600 font-black tracking-widest block mb-1">NUEVA_CITA</span>
+          <span class="font-mono text-[10px] text-blue-600 font-black tracking-widest block mb-1">NUEVA CITA</span>
           <h2 class="text-3xl font-black tracking-tighter uppercase">Registrar Cita</h2>
         </div>
         <button (click)="cerrarNueva()" class="font-mono font-bold text-gray-400 hover:text-gray-950 text-sm tracking-widest cursor-pointer ml-4">[ X ]</button>
@@ -397,26 +387,18 @@
             </div>
           }
           @if (clienteElegido) {
-            <span class="font-mono text-[10px] text-green-600 font-bold mt-1 block">CLIENTE_OK: #{{clienteElegido.id}}</span>
+            <span class="font-mono text-[10px] text-green-600 font-bold mt-1 block">CLIENTE OK: #{{clienteElegido.id}}</span>
           }
         </div>
 
         <div class="grid grid-cols-2 gap-x-8 gap-y-4">
           <div class="border-b-2 border-gray-950">
             <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Fecha *</label>
-            <input [(ngModel)]="nuevaCita.fecha" type="date" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
+            <input [(ngModel)]="nuevaFecha" type="date" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
           </div>
           <div class="border-b-2 border-gray-950">
             <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Hora *</label>
-            <input [(ngModel)]="nuevaCita.hora" type="time" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
-          </div>
-          <div class="border-b-2 border-gray-950">
-            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Duración</label>
-            <select [(ngModel)]="nuevaCita.duracion" class="w-full bg-transparent outline-none py-1 text-sm font-bold cursor-pointer">
-              @for (d of duraciones; track d) {
-                <option [value]="d">{{d}} min</option>
-              }
-            </select>
+            <input [(ngModel)]="nuevaHora" type="time" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
           </div>
           <div class="col-span-2 border-b-2 border-gray-950">
             <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Motivo *</label>
@@ -433,7 +415,7 @@
 
       <div class="border-t-4 border-gray-950 p-4 flex gap-3 shrink-0">
         <button (click)="crearCita()" [disabled]="creando" class="px-6 py-2 font-black text-xs uppercase bg-gray-950 text-white hover:bg-blue-600 transition-all cursor-pointer disabled:opacity-50">
-          {{creando ? 'REGISTRANDO...' : 'REGISTRAR_CITA'}}
+          {{creando ? 'REGISTRANDO...' : 'REGISTRAR CITA'}}
         </button>
         <button (click)="cerrarNueva()" class="px-6 py-2 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all cursor-pointer">CANCELAR</button>
       </div>

@@ -38,7 +38,7 @@ echo Iniciando backup de la base de datos %DB_NAME%...
 echo Destino: %BACKUP_FILE%
 echo.
 
-mysqldump ^
+"C:\Program Files\MariaDB 11.6\bin\mysqldump.exe" ^
     --host=%DB_HOST% ^
     --port=%DB_PORT% ^
     --user=%DB_USER% ^

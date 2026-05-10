@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # OPTIBASE — ERP para el sector óptico
 
 TFG desarrollado con Spring Boot + Angular. Sistema de gestión integral para ópticas: clientes, citas, ventas, inventario y graduaciones.

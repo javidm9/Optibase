@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Articulo, CategoriaArticulo } from '../../models/articulo';
-import { ArticuloService } from '../../services/articulo.service';
+import { Articulo, CategoriaProducto } from '../../models/articulo';
+import { ArticuloService } from '../../services/producto.service';
 
 @Component({
   selector: 'app-inventario',
@@ -19,7 +19,7 @@ export class InventarioPage implements OnInit {
   cargando = false;
   errorCarga: string | null = null;
 
-  categoriaActiva: 'TODOS' | CategoriaArticulo = 'TODOS';
+  categoriaActiva: 'TODOS' | CategoriaProducto = 'TODOS';
   filtroNombre = '';
   currentPage = 1;
   itemsPerPage = 20;
@@ -38,13 +38,13 @@ export class InventarioPage implements OnInit {
   creando = false;
   errorNuevo: string | null = null;
 
-  readonly categorias: { value: CategoriaArticulo; label: string }[] = [
+  readonly categorias: { value: CategoriaProducto; label: string }[] = [
     { value: 'MONTURA',  label: 'Montura' },
     { value: 'GAFA_SOL', label: 'Gafa de Sol' },
     { value: 'LIQUIDO',  label: 'Líquido' },
   ];
 
-  constructor(private articuloService: ArticuloService, private router: Router) {}
+  constructor(private articuloService: ArticuloService, private router: Router, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.cargarArticulos();
@@ -58,6 +58,7 @@ export class InventarioPage implements OnInit {
         this.articulos = data.sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
         this.cargando = false;
         this.aplicarFiltros();
+        this.cdr.detectChanges();
       },
       error: () => {
         this.errorCarga = 'No se pudo conectar con el servidor. Verifica que el backend esté activo en localhost:8080.';
@@ -69,14 +70,13 @@ export class InventarioPage implements OnInit {
   aplicarFiltros() {
     let resultado = this.articulos;
     if (this.categoriaActiva !== 'TODOS') {
-      resultado = resultado.filter(a => a.categoria === this.categoriaActiva);
+      resultado = resultado.filter(a => a.tipo === this.categoriaActiva);
     }
     if (this.filtroNombre.trim()) {
       const q = this.filtroNombre.toLowerCase();
       resultado = resultado.filter(a =>
-        a.nombre.toLowerCase().includes(q) ||
-        a.marca.toLowerCase().includes(q) ||
-        a.referencia.toLowerCase().includes(q)
+        a.modelo.toLowerCase().includes(q) ||
+        a.marca.toLowerCase().includes(q)
       );
     }
     this.totalPages = Math.ceil(resultado.length / this.itemsPerPage) || 1;
@@ -87,7 +87,7 @@ export class InventarioPage implements OnInit {
   }
 
   setCategoriaActiva(cat: string) {
-    this.categoriaActiva = cat as 'TODOS' | CategoriaArticulo;
+    this.categoriaActiva = cat as 'TODOS' | CategoriaProducto;
     this.currentPage = 1;
     this.aplicarFiltros();
   }
@@ -104,8 +104,8 @@ export class InventarioPage implements OnInit {
     this.router.navigate(['/menu']);
   }
 
-  categoriaLabel(cat: CategoriaArticulo): string {
-    return this.categorias.find(c => c.value === cat)?.label ?? cat;
+  categoriaLabel(tipo: CategoriaProducto): string {
+    return this.categorias.find(c => c.value === tipo)?.label ?? tipo;
   }
 
   stockClass(stock: number): string {
@@ -168,7 +168,7 @@ export class InventarioPage implements OnInit {
 
   eliminarArticulo(articulo: Articulo) {
     if (!articulo.id) return;
-    if (!confirm(`¿Eliminar "${articulo.nombre}" del inventario? Esta acción no se puede deshacer.`)) return;
+    if (!confirm(`¿Eliminar "${articulo.modelo}" del inventario? Esta acción no se puede deshacer.`)) return;
     this.articuloService.deleteArticulo(articulo.id).subscribe({
       next: () => {
         this.articulos = this.articulos.filter(a => a.id !== articulo.id);
@@ -182,8 +182,8 @@ export class InventarioPage implements OnInit {
   // === NUEVO ARTÍCULO ===
   abrirNuevo() {
     this.nuevoArticulo = {
-      nombre: '', referencia: '', categoria: 'MONTURA',
-      marca: '', precio: 0, stock: 0, descripcion: ''
+      modelo: '', tipo: 'MONTURA',
+      marca: '', precio: 0, stock: 0
     };
     this.mostrarNuevo = true;
     this.errorNuevo = null;
@@ -196,8 +196,8 @@ export class InventarioPage implements OnInit {
   }
 
   crearArticulo() {
-    if (!this.nuevoArticulo.nombre?.trim() || !this.nuevoArticulo.referencia?.trim()) {
-      this.errorNuevo = 'Nombre y referencia son obligatorios.';
+    if (!this.nuevoArticulo.modelo?.trim()) {
+      this.errorNuevo = 'El nombre del modelo es obligatorio.';
       return;
     }
     if ((this.nuevoArticulo.stock ?? 0) < 0) {

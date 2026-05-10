@@ -34,22 +34,22 @@
 
 ## 2. Casos de prueba manuales — End-to-End (E2E)
 
-| ID        | Descripción                                           | Tipo    | Resultado esperado                           | Estado     |
-|-----------|-------------------------------------------------------|---------|----------------------------------------------|------------|
-| TC-E2E-01 | Arrancar back y front y acceder a `localhost:4200`    | Manual  | Página de login visible, sin errores en consola | 🔲 Pendiente |
-| TC-E2E-02 | Login como admin y navegar a sección Clientes         | Manual  | Listado de clientes visible, botones de edición activos | 🔲 Pendiente |
-| TC-E2E-03 | Login como usuario normal e intentar crear cliente    | Manual  | Botón de creación deshabilitado o respuesta 403 | 🔲 Pendiente |
-| TC-E2E-04 | Cerrar sesión y verificar que la ruta protegida redirige | Manual | Redirección al login, token eliminado del storage | 🔲 Pendiente |
+| ID        | Descripción                                           | Tipo    | Resultado esperado                           | Fecha      | Estado     |
+|-----------|-------------------------------------------------------|---------|----------------------------------------------|------------|------------|
+| TC-E2E-01 | Arrancar back y front y acceder a `localhost:4200`    | Manual  | Página de login visible, sin errores en consola | 10/05/2026 | ✅ PASS |
+| TC-E2E-02 | Login como admin y navegar a sección Clientes         | Manual  | Listado de clientes visible, botones de edición activos | 10/05/2026 | ✅ PASS |
+| TC-E2E-03 | Login como usuario normal e intentar crear cliente    | Manual  | Botón de creación deshabilitado o respuesta 403 | 10/05/2026 | ✅ PASS |
+| TC-E2E-04 | Cerrar sesión y verificar que la ruta protegida redirige | Manual | Redirección al login, token eliminado del storage | 10/05/2026 | ✅ PASS |
 
 ---
 
 ## 3. Casos de prueba de backup y restauración
 
-| ID        | Descripción                                    | Tipo    | Resultado esperado                              | Estado     |
-|-----------|------------------------------------------------|---------|-------------------------------------------------|------------|
-| TC-BKP-01 | Ejecutar `backup.bat` / `backup.sh`            | Manual  | Fichero `.sql` creado en `scripts/backups/` con timestamp | 🔲 Pendiente |
-| TC-BKP-02 | Verificar contenido del fichero de backup      | Manual  | El `.sql` contiene DDL + DML de todas las tablas | 🔲 Pendiente |
-| TC-BKP-03 | Ejecutar `restore.bat` con el backup generado  | Manual  | BD restaurada correctamente, datos coinciden    | 🔲 Pendiente |
+| ID        | Descripción                                    | Tipo    | Resultado esperado                              | Fecha      | Estado     |
+|-----------|------------------------------------------------|---------|-------------------------------------------------|------------|------------|
+| TC-BKP-01 | Ejecutar `backup.bat` / `backup.sh`            | Manual  | Fichero `.sql` creado en `scripts/backups/` con timestamp | 10/05/2026 | ✅ PASS |
+| TC-BKP-02 | Verificar contenido del fichero de backup      | Manual  | El `.sql` contiene DDL + DML de todas las tablas | 10/05/2026 | ✅ PASS |
+| TC-BKP-03 | Ejecutar `restore.bat` con el backup generado  | Manual  | BD restaurada correctamente, datos coinciden    | 10/05/2026 | ✅ PASS |
 
 ---
 
@@ -103,3 +103,22 @@ restore.bat scripts\backups\optibase_YYYYMMDD_HHMMSS.sql
 **Paso 4 — Verificar restauración:**
 - Acceder a MySQL Workbench o consola y comprobar que los datos están presentes.
 - Arrancar la aplicación y hacer login para confirmar el funcionamiento.
+
+---
+
+## 5. Evidencias
+
+Capturas de pantalla obtenidas durante la sesión de pruebas del 10/05/2026.
+
+| Fichero                          | Caso relacionado | Descripción                                                     |
+|----------------------------------|------------------|-----------------------------------------------------------------|
+| `evidencias/01_login.png`        | TC-E2E-01        | Página de login visible en `localhost:4200`, sin errores en consola |
+| `evidencias/02_menu.png`         | TC-E2E-01        | Menú principal tras login correcto como ADMIN                   |
+| `evidencias/03_clientes.png`     | TC-E2E-02        | Listado de clientes con botones de edición activos (ROLE_ADMIN) |
+| `evidencias/04_agenda.png`       | TC-E2E-02        | Módulo de citas con datos de fecha, hora y cliente visibles     |
+| `evidencias/05_inventario.png`   | TC-E2E-02        | Módulo de inventario con productos cargados correctamente       |
+| `evidencias/06_tests.png`        | TC-AUTH / TC-CLI | Resultado de `mvn test`: todos los tests pasan (BUILD SUCCESS)  |
+| `evidencias/07_backup.png`       | TC-BKP-01        | Ejecución de `backup.bat` y creación del fichero `.sql`         |
+| `evidencias/07_backup2.png`      | TC-BKP-02        | Contenido del fichero `.sql` con DDL y DML de las tablas        |
+| `evidencias/08_citaeliminada.png`| TC-E2E-02        | Eliminación de una cita desde el módulo de agenda               |
+| `evidencias/09_restauracion.png` | TC-BKP-03        | Ejecución de `restore.bat` con mensaje `[OK]` al finalizar      |

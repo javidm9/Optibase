@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -33,12 +33,16 @@ export class CitasPage implements OnInit {
   citaSeleccionada: Cita | null = null;
   modoEdicion = false;
   citaEditando: Partial<Cita> = {};
+  editandoFecha = '';
+  editandoHora  = '';
   guardando = false;
   errorModal: string | null = null;
 
   // Modal Nueva Cita
   mostrarNueva = false;
   nuevaCita: Partial<Cita> = {};
+  nuevaFecha = '';
+  nuevaHora  = '';
   creando = false;
   errorNueva: string | null = null;
 
@@ -48,7 +52,6 @@ export class CitasPage implements OnInit {
   clientesFiltrados: Cliente[] = [];
   clienteElegido: Cliente | null = null;
 
-  readonly duraciones = [15, 30, 45, 60, 90];
   readonly estados: EstadoCita[] = ['PENDIENTE', 'COMPLETADA', 'CANCELADA'];
   readonly DIAS_SEMANA = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
   readonly MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -63,7 +66,8 @@ export class CitasPage implements OnInit {
   constructor(
     private citaService: CitaService,
     private clienteService: ClienteService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -74,16 +78,29 @@ export class CitasPage implements OnInit {
     });
   }
 
+  // === HELPERS DE CAMPO ===
+  fechaCita(c: Cita): string {
+    return c.fechaHora ? c.fechaHora.split('T')[0] : '';
+  }
+
+  horaCita(c: Cita): string {
+    return c.fechaHora ? (c.fechaHora.split('T')[1] ?? '').substring(0, 5) : '';
+  }
+
+  nombreCliente(c: Cita): string {
+    return c.cliente ? `${c.cliente.nombre} ${c.cliente.apellidos}` : '';
+  }
+
+  // === CARGA ===
   cargarCitas() {
     this.cargando = true;
     this.errorCarga = null;
     this.citaService.getCitas().subscribe({
       next: (data) => {
-        this.citas = data.sort((a, b) =>
-          (a.fecha + 'T' + a.hora).localeCompare(b.fecha + 'T' + b.hora)
-        );
+        this.citas = data.sort((a, b) => a.fechaHora.localeCompare(b.fechaHora));
         this.cargando = false;
         this.aplicarFiltros();
+        this.cdr.detectChanges();
       },
       error: () => {
         this.errorCarga = 'No se pudo conectar con el servidor. Verifica que el backend esté activo en localhost:8080.';
@@ -94,9 +111,9 @@ export class CitasPage implements OnInit {
 
   aplicarFiltros() {
     this.citasFiltradas = this.citas.filter(c => {
-      const matchCliente = !this.filtroCliente || (c.clienteNombre ?? '').toLowerCase().includes(this.filtroCliente.toLowerCase());
+      const matchCliente = !this.filtroCliente || this.nombreCliente(c).toLowerCase().includes(this.filtroCliente.toLowerCase());
       const matchEstado  = !this.filtroEstado  || c.estado === this.filtroEstado;
-      const matchFecha   = !this.filtroFecha   || c.fecha === this.filtroFecha;
+      const matchFecha   = !this.filtroFecha   || this.fechaCita(c) === this.filtroFecha;
       return matchCliente && matchEstado && matchFecha;
     });
   }
@@ -203,12 +220,13 @@ export class CitasPage implements OnInit {
 
   citasParaDia(d: Date): Cita[] {
     const s = this.dateToStr(d);
-    return this.citas.filter(c => c.fecha === s).sort((a, b) => a.hora.localeCompare(b.hora));
+    return this.citas.filter(c => this.fechaCita(c) === s)
+      .sort((a, b) => a.fechaHora.localeCompare(b.fechaHora));
   }
 
   citasParaSlot(d: Date, hora: string): Cita[] {
     const s = this.dateToStr(d);
-    return this.citas.filter(c => c.fecha === s && c.hora === hora);
+    return this.citas.filter(c => this.fechaCita(c) === s && this.horaCita(c) === hora);
   }
 
   isToday(d: Date): boolean {
@@ -238,11 +256,15 @@ export class CitasPage implements OnInit {
     this.citaSeleccionada = null;
     this.modoEdicion = false;
     this.citaEditando = {};
+    this.editandoFecha = '';
+    this.editandoHora  = '';
     this.errorModal = null;
   }
 
   iniciarEdicion() {
     this.citaEditando = { ...this.citaSeleccionada };
+    this.editandoFecha = this.fechaCita(this.citaSeleccionada!);
+    this.editandoHora  = this.horaCita(this.citaSeleccionada!);
     this.modoEdicion = true;
     this.errorModal = null;
   }
@@ -250,11 +272,14 @@ export class CitasPage implements OnInit {
   cancelarEdicion() {
     this.modoEdicion = false;
     this.citaEditando = {};
+    this.editandoFecha = '';
+    this.editandoHora  = '';
     this.errorModal = null;
   }
 
   guardarCambios() {
     if (!this.citaSeleccionada?.id) return;
+    this.citaEditando.fechaHora = `${this.editandoFecha}T${this.editandoHora}:00`;
     this.guardando = true;
     this.errorModal = null;
     this.citaService.updateCita(this.citaSeleccionada.id, this.citaEditando).subscribe({
@@ -277,7 +302,7 @@ export class CitasPage implements OnInit {
 
   cancelarCita(cita: Cita) {
     if (!cita.id) return;
-    if (!confirm(`¿Cancelar la cita de ${cita.clienteNombre} el ${cita.fecha} a las ${cita.hora}?`)) return;
+    if (!confirm(`¿Cancelar la cita de ${this.nombreCliente(cita)} el ${this.fechaCita(cita)} a las ${this.horaCita(cita)}?`)) return;
     this.citaService.updateCita(cita.id, { estado: 'CANCELADA' }).subscribe({
       next: (actualizada) => {
         const idx = this.citas.findIndex(c => c.id === actualizada.id);
@@ -292,13 +317,9 @@ export class CitasPage implements OnInit {
 
   // === NUEVA CITA ===
   abrirNueva() {
-    this.nuevaCita = {
-      fecha: this.dateToStr(new Date()),
-      hora: '09:00',
-      duracion: 30,
-      motivo: '',
-      estado: 'PENDIENTE'
-    };
+    this.nuevaFecha = this.dateToStr(new Date());
+    this.nuevaHora  = '09:00';
+    this.nuevaCita  = { motivo: '', estado: 'PENDIENTE' };
     this.busquedaCliente = '';
     this.clienteElegido = null;
     this.clientesFiltrados = [];
@@ -309,6 +330,8 @@ export class CitasPage implements OnInit {
   cerrarNueva() {
     this.mostrarNueva = false;
     this.nuevaCita = {};
+    this.nuevaFecha = '';
+    this.nuevaHora  = '';
     this.busquedaCliente = '';
     this.clienteElegido = null;
     this.clientesFiltrados = [];
@@ -328,22 +351,22 @@ export class CitasPage implements OnInit {
 
   seleccionarCliente(cliente: Cliente) {
     this.clienteElegido = cliente;
-    this.nuevaCita.clienteId = cliente.id;
-    this.nuevaCita.clienteNombre = `${cliente.nombre} ${cliente.apellidos}`;
+    this.nuevaCita.cliente = { id: cliente.id!, nombre: cliente.nombre, apellidos: cliente.apellidos };
     this.busquedaCliente = `${cliente.nombre} ${cliente.apellidos}`;
     this.clientesFiltrados = [];
   }
 
   crearCita() {
     if (!this.clienteElegido)              { this.errorNueva = 'Selecciona un cliente.'; return; }
-    if (!this.nuevaCita.fecha || !this.nuevaCita.hora) { this.errorNueva = 'Fecha y hora son obligatorias.'; return; }
+    if (!this.nuevaFecha || !this.nuevaHora) { this.errorNueva = 'Fecha y hora son obligatorias.'; return; }
     if (!this.nuevaCita.motivo?.trim())    { this.errorNueva = 'El motivo es obligatorio.'; return; }
+    this.nuevaCita.fechaHora = `${this.nuevaFecha}T${this.nuevaHora}:00`;
     this.creando = true;
     this.errorNueva = null;
     this.citaService.createCita(this.nuevaCita as Omit<Cita, 'id'>).subscribe({
       next: (creada) => {
         this.citas.push(creada);
-        this.citas.sort((a, b) => (a.fecha + 'T' + a.hora).localeCompare(b.fecha + 'T' + b.hora));
+        this.citas.sort((a, b) => a.fechaHora.localeCompare(b.fechaHora));
         this.cerrarNueva();
         this.creando = false;
         this.aplicarFiltros();
@@ -376,7 +399,7 @@ export class CitasPage implements OnInit {
 
   get citasHoy(): number {
     const hoy = this.dateToStr(new Date());
-    return this.citas.filter(c => c.fecha === hoy && c.estado === 'PENDIENTE').length;
+    return this.citas.filter(c => this.fechaCita(c) === hoy && c.estado === 'PENDIENTE').length;
   }
 
   get citasPendientes(): number {

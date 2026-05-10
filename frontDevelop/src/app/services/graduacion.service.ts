@@ -5,7 +5,7 @@ import { Graduacion } from '../models/graduacion';
 
 @Injectable({ providedIn: 'root' })
 export class GraduacionService {
-  private apiUrl = 'http://localhost:8080/api/graduaciones';
+  private apiUrl = 'http://localhost:8080/api/historiales';
 
   constructor(private http: HttpClient) {}
 

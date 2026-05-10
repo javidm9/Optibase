@@ -178,7 +178,7 @@ export class ClientesList implements OnInit {
     this.cargandoGraduaciones = true;
     this.graduacionService.getByClienteId(this.clienteSeleccionado.id).subscribe({
       next: (data: Graduacion[]) => {
-        this.graduaciones = data.sort((a, b) => b.fecha.localeCompare(a.fecha));
+        this.graduaciones = data.sort((a, b) => (b.fechaRevision ?? '').localeCompare(a.fechaRevision ?? ''));
         this.cargandoGraduaciones = false;
       },
       error: () => { this.cargandoGraduaciones = false; }
@@ -187,8 +187,8 @@ export class ClientesList implements OnInit {
 
   abrirFormGraduacion() {
     this.nuevaGraduacion = {
-      clienteId: this.clienteSeleccionado?.id,
-      fecha: new Date().toISOString().split('T')[0],
+      cliente: { id: this.clienteSeleccionado?.id as number },
+      fechaRevision: new Date().toISOString().split('T')[0],
       odEsfera: 0, odCilindro: 0, odEje: 0, odAdicion: undefined,
       oiEsfera: 0, oiCilindro: 0, oiEje: 0, oiAdicion: undefined,
       observaciones: ''
@@ -204,7 +204,7 @@ export class ClientesList implements OnInit {
   }
 
   guardarGraduacion() {
-    if (!this.nuevaGraduacion.fecha) { this.errorGraduacion = 'La fecha es obligatoria.'; return; }
+    if (!this.nuevaGraduacion.fechaRevision) { this.errorGraduacion = 'La fecha es obligatoria.'; return; }
     this.creandoGraduacion = true;
     this.errorGraduacion = null;
     this.graduacionService.createGraduacion(this.nuevaGraduacion as Omit<Graduacion, 'id'>).subscribe({

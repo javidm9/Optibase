@@ -43,7 +43,7 @@ echo.
 echo Restaurando base de datos %DB_NAME%...
 echo.
 
-mysql ^
+"C:\Program Files\MariaDB 11.6\bin\mysql.exe" ^
     --host=%DB_HOST% ^
     --port=%DB_PORT% ^
     --user=%DB_USER% ^
