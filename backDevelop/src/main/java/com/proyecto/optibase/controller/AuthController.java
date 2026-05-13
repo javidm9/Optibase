@@ -37,7 +37,6 @@ public class AuthController {
         return ResponseEntity.ok(new LoginResponse(
                 jwtUtil.generateToken(usuario),
                 usuario.getRol().name(),
-                usuario.getNombre(),
                 usuario.getNombre()
         ));
     }

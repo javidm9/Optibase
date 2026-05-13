@@ -1,0 +1,13 @@
+target/
+.git/
+.gitignore
+*.md
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+compose.yaml
+docker-compose.yml
+src/main/resources/application-local.properties
+src/main/resources/application-dev.properties

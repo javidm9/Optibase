@@ -10,9 +10,11 @@
         <p class="text-[9px] font-mono font-bold text-gray-400 tracking-widest leading-none mt-1 uppercase">DATABASE CORE // REGISTROS TOTALES: {{clientesOriginales.length}}</p>
       </div>
     </div>
-    <button (click)="abrirNuevo()" class="bg-white text-gray-950 px-6 py-2.5 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 cursor-pointer">
-      + NUEVO CLIENTE
-    </button>
+    @if (esAdmin) {
+      <button (click)="abrirNuevo()" class="bg-white text-gray-950 px-6 py-2.5 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 cursor-pointer">
+        + NUEVO CLIENTE
+      </button>
+    }
   </header>
 
   <section class="shrink-0 grid grid-cols-1 md:grid-cols-3 gap-8 mb-6 px-2">
@@ -177,10 +179,6 @@
             <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">C.P.</span>
             <span class="font-mono font-bold text-sm">{{clienteSeleccionado.codigoPostal}}</span>
           </div>
-          <div>
-            <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Fecha Ingreso</span>
-            <span class="font-mono font-bold text-sm">{{clienteSeleccionado.fechaIngreso}}</span>
-          </div>
         </div>
       }
 
@@ -227,10 +225,6 @@
             <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">C.P.</label>
             <input [(ngModel)]="clienteEditando.codigoPostal" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
           </div>
-          <div class="border-b-2 border-gray-950">
-            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Fecha Ingreso</label>
-            <input [(ngModel)]="clienteEditando.fechaIngreso" type="date" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
-          </div>
         </div>
       }
 
@@ -276,6 +270,10 @@
                       <label class="block text-[8px] text-gray-400 uppercase">Adición</label>
                       <input [(ngModel)]="nuevaGraduacion.odAdicion" type="number" step="0.25" class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
                     </div>
+                    <div class="col-span-2">
+                      <label class="block text-[8px] text-gray-400 uppercase">Agudeza Visual OD</label>
+                      <input [(ngModel)]="nuevaGraduacion.avOd" type="number" step="0.1" min="0" max="2" class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
+                    </div>
                   </div>
                 </div>
                 <!-- OI -->
@@ -298,7 +296,15 @@
                       <label class="block text-[8px] text-gray-400 uppercase">Adición</label>
                       <input [(ngModel)]="nuevaGraduacion.oiAdicion" type="number" step="0.25" class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
                     </div>
+                    <div class="col-span-2">
+                      <label class="block text-[8px] text-gray-400 uppercase">Agudeza Visual OI</label>
+                      <input [(ngModel)]="nuevaGraduacion.avOi" type="number" step="0.1" min="0" max="2" class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
+                    </div>
                   </div>
+                </div>
+                <div class="col-span-2 border-b-2 border-gray-950">
+                  <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Distancia Interpupilar (mm)</label>
+                  <input [(ngModel)]="nuevaGraduacion.dip" type="number" step="0.5" min="50" max="80" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
                 </div>
                 <div class="col-span-2 border-b-2 border-gray-950">
                   <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Observaciones</label>
@@ -369,7 +375,7 @@
 
       <!-- Footer de acciones -->
       <div class="border-t-4 border-gray-950 p-4 flex gap-3 shrink-0">
-        @if (vistaFicha === 'datos' && !modoEdicion) {
+        @if (vistaFicha === 'datos' && !modoEdicion && esAdmin) {
           <button (click)="iniciarEdicion()" class="px-6 py-2 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all cursor-pointer">
             EDITAR
           </button>
@@ -445,10 +451,6 @@
         <div class="border-b-2 border-gray-950">
           <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Código Postal</label>
           <input [(ngModel)]="nuevoCliente.codigoPostal" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold" placeholder="28001">
-        </div>
-        <div class="border-b-2 border-gray-950">
-          <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Fecha Ingreso</label>
-          <input [(ngModel)]="nuevoCliente.fechaIngreso" type="date" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
         </div>
       </div>
 

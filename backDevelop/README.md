@@ -4,7 +4,7 @@ API REST del sistema de gestión **Optibase**, desarrollada como parte del Traba
 
 ## Tecnologías
 
-- Java 25
+- Java 17
 - Spring Boot 4.0.3
 - Spring Security + JWT
 - Spring Data JPA / Hibernate
@@ -14,7 +14,7 @@ API REST del sistema de gestión **Optibase**, desarrollada como parte del Traba
 
 ## Requisitos previos
 
-- Java 25 o superior
+- Java 17 o superior
 - MySQL corriendo en `localhost:3306`
 - Base de datos `optibase_db` creada
 
@@ -48,13 +48,28 @@ La API estará disponible en `http://localhost:8080`.
 
 ## Configuración de base de datos
 
-En `src/main/resources/application.properties`:
+Las credenciales se inyectan mediante variables de entorno definidas en `application-local.properties` (fichero excluido del repositorio). Copia la plantilla y rellena con tus valores:
+
+```bash
+# Linux/Mac
+cp src/main/resources/application-local.properties.example \
+   src/main/resources/application-local.properties
+
+# Windows
+copy src\main\resources\application-local.properties.example ^
+     src\main\resources\application-local.properties
+```
 
 ```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/optibase_db
-spring.datasource.username=root
-spring.datasource.password=123456
+DB_USER=tu_usuario_mysql
+DB_PASSWORD=tu_contraseña_mysql
+DB_URL=jdbc:mysql://localhost:3306/optibase_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+JWT_SECRET=<clave_base64_minimo_32_bytes>
+JWT_EXPIRATION=86400000
+CORS_ORIGINS=http://localhost:4200
 ```
+
+> Consulta el README raíz para instrucciones completas de configuración.
 
 ## Estructura del proyecto
 

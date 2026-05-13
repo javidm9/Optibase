@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Articulo, CategoriaProducto } from '../../models/articulo';
 import { ArticuloService } from '../../services/producto.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-inventario',
@@ -44,7 +45,11 @@ export class InventarioPage implements OnInit {
     { value: 'LIQUIDO',  label: 'Líquido' },
   ];
 
-  constructor(private articuloService: ArticuloService, private router: Router, private cdr: ChangeDetectorRef) {}
+  esAdmin = false;
+
+  constructor(private articuloService: ArticuloService, private router: Router, private cdr: ChangeDetectorRef, private authService: AuthService) {
+    this.esAdmin = this.authService.getRol() === 'ROLE_ADMIN';
+  }
 
   ngOnInit() {
     this.cargarArticulos();
@@ -142,6 +147,10 @@ export class InventarioPage implements OnInit {
 
   guardarCambios() {
     if (!this.articuloSeleccionado?.id) return;
+    if (!this.articuloEditando.marca?.trim()) {
+      this.errorModal = 'La marca es obligatoria.';
+      return;
+    }
     if ((this.articuloEditando.stock ?? 0) < 0) {
       this.errorModal = 'El stock no puede ser negativo.';
       return;
@@ -198,6 +207,10 @@ export class InventarioPage implements OnInit {
   crearArticulo() {
     if (!this.nuevoArticulo.modelo?.trim()) {
       this.errorNuevo = 'El nombre del modelo es obligatorio.';
+      return;
+    }
+    if (!this.nuevoArticulo.marca?.trim()) {
+      this.errorNuevo = 'La marca es obligatoria.';
       return;
     }
     if ((this.nuevoArticulo.stock ?? 0) < 0) {

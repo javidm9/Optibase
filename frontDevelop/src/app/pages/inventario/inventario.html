@@ -16,10 +16,12 @@
         </p>
       </div>
     </div>
-    <button (click)="abrirNuevo()"
-      class="bg-white text-gray-950 px-6 py-2.5 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 cursor-pointer">
-      + NUEVO ARTÍCULO
-    </button>
+    @if (esAdmin) {
+      <button (click)="abrirNuevo()"
+        class="bg-white text-gray-950 px-6 py-2.5 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 cursor-pointer">
+        + NUEVO ARTÍCULO
+      </button>
+    }
   </header>
 
   <!-- Tabs de categoría + filtro nombre -->
@@ -211,7 +213,7 @@
     }
 
     <div class="border-t-4 border-gray-950 p-4 flex gap-3 shrink-0">
-      @if (!modoEdicion) {
+      @if (!modoEdicion && esAdmin) {
       <button (click)="iniciarEdicion()"
         class="px-6 py-2 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all cursor-pointer">
         EDITAR
@@ -260,7 +262,7 @@
           placeholder="Nombre del modelo">
       </div>
       <div class="border-b-2 border-gray-950">
-        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Marca</label>
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Marca *</label>
         <input [(ngModel)]="nuevoArticulo.marca" class="w-full bg-transparent outline-none py-1 text-sm font-bold"
           placeholder="Marca">
       </div>

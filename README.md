@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # OPTIBASE — ERP para el sector óptico
 
 TFG desarrollado con Spring Boot + Angular. Sistema de gestión integral para ópticas: clientes, citas, ventas, inventario y graduaciones.
@@ -10,7 +9,7 @@ TFG desarrollado con Spring Boot + Angular. Sistema de gestión integral para ó
 | Capa         | Tecnología                   | Versión  |
 |--------------|------------------------------|----------|
 | Backend      | Spring Boot                  | 4.0.3    |
-| Lenguaje     | Java                         | 23       |
+| Lenguaje     | Java                         | 17       |
 | Persistencia | Spring Data JPA              | —        |
 | Base de datos| MySQL                        | 8.x      |
 | Seguridad    | Spring Security + JWT (JJWT) | 0.12.6   |
@@ -24,7 +23,7 @@ TFG desarrollado con Spring Boot + Angular. Sistema de gestión integral para ó
 
 ## Requisitos previos
 
-- Java 23+
+- Java 17+
 - Maven 3.6+ (o usar el wrapper `mvnw` incluido)
 - Node.js 20+ y npm
 - MySQL 8.x en ejecución local
@@ -157,6 +156,8 @@ Los backups se guardan en `scripts/backups/` con formato `optibase_backup_YYYYMM
 # Windows
 scripts\restore.bat scripts\backups\optibase_backup_YYYYMMDD_HHMMSS.sql
 ```
+
+> **Nota de portabilidad:** Los scripts intentan usar `mysqldump`/`mysql` del PATH del sistema. Si no están en el PATH (por ejemplo, en instalaciones de MariaDB en Windows que no añaden la carpeta `bin` automáticamente), edita la variable `MYSQL_BIN` al inicio de cada script con la ruta correcta a tu instalación. Ejemplo: `SET MYSQL_BIN=C:\Program Files\MySQL\MySQL Server 8.0\bin`
 
 ---
 

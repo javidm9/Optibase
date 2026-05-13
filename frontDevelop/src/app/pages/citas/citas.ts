@@ -6,6 +6,7 @@ import { Cita, EstadoCita } from '../../models/cita';
 import { Cliente } from '../../models/cliente';
 import { CitaService } from '../../services/cita.service';
 import { ClienteService } from '../../services/cliente.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-citas',
@@ -63,12 +64,17 @@ export class CitasPage implements OnInit {
     return `${h.toString().padStart(2, '0')}:${m}`;
   });
 
+  esAdmin = false;
+
   constructor(
     private citaService: CitaService,
     private clienteService: ClienteService,
     private router: Router,
-    private cdr: ChangeDetectorRef
-  ) {}
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService
+  ) {
+    this.esAdmin = this.authService.getRol() === 'ROLE_ADMIN';
+  }
 
   ngOnInit() {
     this.cargarCitas();
@@ -303,7 +309,7 @@ export class CitasPage implements OnInit {
   cancelarCita(cita: Cita) {
     if (!cita.id) return;
     if (!confirm(`¿Cancelar la cita de ${this.nombreCliente(cita)} el ${this.fechaCita(cita)} a las ${this.horaCita(cita)}?`)) return;
-    this.citaService.updateCita(cita.id, { estado: 'CANCELADA' }).subscribe({
+    this.citaService.updateCita(cita.id, { ...cita, estado: 'CANCELADA' }).subscribe({
       next: (actualizada) => {
         const idx = this.citas.findIndex(c => c.id === actualizada.id);
         if (idx !== -1) this.citas[idx] = actualizada;

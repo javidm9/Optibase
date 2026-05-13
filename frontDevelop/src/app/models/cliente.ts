@@ -10,5 +10,4 @@ export interface Cliente {
   localidad: string;
   provincia: string;
   codigoPostal: string;
-  fechaIngreso: string; 
 }

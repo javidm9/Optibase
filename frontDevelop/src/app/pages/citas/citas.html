@@ -38,9 +38,11 @@
           Mes
         </button>
       </div>
-      <button (click)="abrirNueva()" class="bg-white text-gray-950 px-6 py-2.5 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 cursor-pointer">
-        + NUEVA CITA
-      </button>
+      @if (esAdmin) {
+        <button (click)="abrirNueva()" class="bg-white text-gray-950 px-6 py-2.5 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 cursor-pointer">
+          + NUEVA CITA
+        </button>
+      }
     </div>
   </header>
 
@@ -335,7 +337,7 @@
       }
 
       <div class="border-t-4 border-gray-950 p-4 flex gap-3 shrink-0">
-        @if (!modoEdicion) {
+        @if (!modoEdicion && esAdmin) {
           <button (click)="iniciarEdicion()" class="px-6 py-2 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all cursor-pointer">EDITAR</button>
           @if (citaSeleccionada.estado === 'PENDIENTE') {
             <button (click)="cancelarCita(citaSeleccionada)" class="px-6 py-2 font-black text-xs uppercase border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white transition-all cursor-pointer">CANCELAR CITA</button>

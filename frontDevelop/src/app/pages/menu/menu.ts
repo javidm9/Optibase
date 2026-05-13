@@ -10,6 +10,9 @@ import { AuthService } from '../../services/auth.service';
 })
 export class Menu {
 
+  readonly nombreUsuario = this.authService.getNombre() ?? 'Usuario';
+  readonly rolUsuario    = this.authService.getRol()    ?? '';
+
   constructor(private router: Router, private authService: AuthService) {}
 
   irAClientes()   { this.router.navigate(['/clientes']); }

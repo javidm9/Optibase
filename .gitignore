@@ -5,7 +5,8 @@
 # --- Credenciales y configuracion local (NUNCA al repo) ---
 **/application-local.properties
 **/application-dev.properties
-**/application-prod.properties
+# application-prod.properties NO se excluye: usa solo ${VAR} sin valores reales
+# y debe estar en el repo para que la imagen Docker de Railway pueda cargarlo.
 **/.env
 **/.env.local
 **/.env.development

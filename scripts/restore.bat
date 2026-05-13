@@ -4,10 +4,15 @@
 :: Uso: restore.bat <ruta_al_fichero.sql>
 :: ============================================================
 
+:: --- CONFIGURACION (ajusta estos valores si es necesario) ---
 SET DB_HOST=localhost
 SET DB_PORT=3306
 SET DB_NAME=optibase_db
 SET DB_USER=root
+:: Ruta de fallback si mysql no esta en el PATH del sistema.
+:: Ajusta esta ruta a tu instalacion de MySQL/MariaDB si es necesario.
+SET MYSQL_BIN=C:\Program Files\MariaDB 11.6\bin
+:: ------------------------------------------------------------
 
 :: Comprobar que se ha pasado un fichero como parametro
 IF "%~1"=="" (
@@ -29,7 +34,7 @@ echo  %DB_NAME% en %DB_HOST%:%DB_PORT%
 echo  Fichero a restaurar: %SQL_FILE%
 echo ============================================================
 echo.
-SET /P CONFIRM=¿Confirmas la restauracion? (s/N):
+SET /P CONFIRM=Confirmas la restauracion? (s/N):
 
 IF /I NOT "%CONFIRM%"=="s" (
     echo Operacion cancelada.
@@ -43,7 +48,15 @@ echo.
 echo Restaurando base de datos %DB_NAME%...
 echo.
 
-"C:\Program Files\MariaDB 11.6\bin\mysql.exe" ^
+:: Intentar primero mysql del PATH; si falla, usar la ruta de fallback
+WHERE mysql >NUL 2>&1
+IF %ERRORLEVEL% EQU 0 (
+    SET MYSQL_CMD=mysql
+) ELSE (
+    SET MYSQL_CMD="%MYSQL_BIN%\mysql.exe"
+)
+
+%MYSQL_CMD% ^
     --host=%DB_HOST% ^
     --port=%DB_PORT% ^
     --user=%DB_USER% ^
@@ -54,5 +67,6 @@ IF %ERRORLEVEL% EQU 0 (
     echo [OK] Restauracion completada correctamente.
 ) ELSE (
     echo [ERROR] La restauracion fallo con codigo de error %ERRORLEVEL%
+    echo Comprueba que mysql este en el PATH o ajusta la variable MYSQL_BIN al inicio del script.
     EXIT /B 1
 )

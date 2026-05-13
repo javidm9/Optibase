@@ -6,6 +6,7 @@ import { Cliente } from '../../models/cliente';
 import { Graduacion } from '../../models/graduacion';
 import { ClienteService } from '../../services/cliente.service';
 import { GraduacionService } from '../../services/graduacion.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-clientes',
@@ -46,12 +47,17 @@ export class ClientesList implements OnInit {
   creandoGraduacion = false;
   errorGraduacion: string | null = null;
 
+  esAdmin = false;
+
   constructor(
     private clienteService: ClienteService,
     private graduacionService: GraduacionService,
     private router: Router,
-    private cdr: ChangeDetectorRef
-  ) {}
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService
+  ) {
+    this.esAdmin = this.authService.getRol() === 'ROLE_ADMIN';
+  }
 
   ngOnInit() {
     this.obtenerClientesDeJava();
@@ -189,9 +195,9 @@ export class ClientesList implements OnInit {
     this.nuevaGraduacion = {
       cliente: { id: this.clienteSeleccionado?.id as number },
       fechaRevision: new Date().toISOString().split('T')[0],
-      odEsfera: 0, odCilindro: 0, odEje: 0, odAdicion: undefined,
-      oiEsfera: 0, oiCilindro: 0, oiEje: 0, oiAdicion: undefined,
-      observaciones: ''
+      odEsfera: 0, odCilindro: 0, odEje: 0, odAdicion: undefined, avOd: undefined,
+      oiEsfera: 0, oiCilindro: 0, oiEje: 0, oiAdicion: undefined, avOi: undefined,
+      dip: undefined, observaciones: ''
     };
     this.mostrarFormGraduacion = true;
     this.errorGraduacion = null;
@@ -233,8 +239,7 @@ export class ClientesList implements OnInit {
     this.nuevoCliente = {
       nombre: '', apellidos: '', dni: '', telefono: '',
       direccion: '', edad: '', fechaNacimiento: '',
-      localidad: '', provincia: '', codigoPostal: '',
-      fechaIngreso: new Date().toISOString().split('T')[0]
+      localidad: '', provincia: '', codigoPostal: ''
     };
     this.mostrarNuevo = true;
     this.errorNuevo = null;

@@ -7,10 +7,14 @@ export interface Graduacion {
   odCilindro: number;
   odEje: number;
   odAdicion?: number;
+  avOd?: number;
   // Ojo Izquierdo
   oiEsfera: number;
   oiCilindro: number;
   oiEje: number;
   oiAdicion?: number;
+  avOi?: number;
+  // General
+  dip?: number;
   observaciones?: string;
 }

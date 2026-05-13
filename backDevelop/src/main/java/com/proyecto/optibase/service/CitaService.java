@@ -3,7 +3,9 @@ package com.proyecto.optibase.service;
 import com.proyecto.optibase.model.CitaModel;
 import com.proyecto.optibase.repository.CitaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -26,7 +28,7 @@ public class CitaService {
                 : citaRepository.existsByFechaHoraAndIdNot(cita.getFechaHora(), cita.getId());
 
         if (hayConflicto) {
-            throw new RuntimeException("Error: Ya existe una cita programada para esa fecha/hora");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya existe una cita programada para esa fecha/hora");
         }
         return citaRepository.save(cita);
     }
