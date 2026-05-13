@@ -10,10 +10,13 @@ import { AuthService } from '../../services/auth.service';
 })
 export class Menu {
 
-  readonly nombreUsuario = this.authService.getNombre() ?? 'Usuario';
-  readonly rolUsuario    = this.authService.getRol()    ?? '';
+  nombreUsuario: string = '';
+  rolUsuario: string = '';
 
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(private router: Router, private authService: AuthService) {
+    this.nombreUsuario = this.authService.getNombre() ?? 'Usuario';
+    this.rolUsuario    = this.authService.getRol()    ?? '';
+  }
 
   irAClientes()   { this.router.navigate(['/clientes']); }
   irACitas()      { this.router.navigate(['/citas']); }
