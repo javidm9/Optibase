@@ -9,7 +9,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/encargos")
-@CrossOrigin(origins = "http://localhost:4200")
 public class EncargoController {
 
     @Autowired
