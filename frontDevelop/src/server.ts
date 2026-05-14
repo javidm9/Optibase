@@ -16,8 +16,8 @@ app.use(
 );
 
 // SPA fallback: cualquier ruta que no sea un fichero estático devuelve index.html
-// y Angular Router se encarga en el cliente — sin SSR, sin peticiones HTTP en servidor
-app.get('*', (_req, res) => {
+// Uso app.use en vez de app.get('*') porque path-to-regexp v8 no acepta wildcards sin nombre
+app.use((_req, res) => {
   res.sendFile(join(browserDistFolder, 'index.html'));
 });
 
