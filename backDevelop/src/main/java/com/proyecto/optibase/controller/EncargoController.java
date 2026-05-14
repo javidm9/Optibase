@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
+// Controlador de encargos a fábrica: permite filtrar por tipo y por cliente, útil en el módulo de seguimiento
 @RestController
 @RequestMapping("/api/encargos")
 public class EncargoController {

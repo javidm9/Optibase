@@ -7,13 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
+// Controlador de ventas: el POST delega en VentaService.guardarVenta() que también descuenta el stock del producto
 @RestController
 @RequestMapping("/api/ventas")
 public class VentaController {
 
     @Autowired
     private VentaService ventaService;
-    
+
     @GetMapping
     public List<VentaModel> obtenerTodas() {
         return ventaService.obtenerTodas();
@@ -24,6 +25,7 @@ public class VentaController {
         return ventaService.obtenerVentasPorCliente(clienteId);
     }
 
+    // Este endpoint lo usa el módulo de estadísticas para mostrar el listado de deudas pendientes
     @GetMapping("/pendientes")
     public List<VentaModel> obtenerPendientes() {
         return ventaService.obtenerPendientesDePago();

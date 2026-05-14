@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { Venta } from '../models/venta';
 import { environment } from '../../environments/environment';
 
+// Al crear una venta, el back descuenta stock automáticamente; si el stock es 0 devuelve 400
 @Injectable({ providedIn: 'root' })
 export class VentaService {
   private apiUrl = `${environment.apiUrl}/api/ventas`;

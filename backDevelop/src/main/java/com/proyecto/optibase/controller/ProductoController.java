@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
+// Controlador de inventario: separo productos principales de recambios para que la tabla principal no se llene de accesorios
 @RestController
 @RequestMapping("/api/productos")
 public class ProductoController {
@@ -16,6 +17,7 @@ public class ProductoController {
 
     @GetMapping
     public List<ProductoModel> obtenerPrincipales() {
+        // Solo devuelvo los que tienen esRecambio=false; los recambios se piden desde la ficha del producto padre
         return productoService.obtenerProductosPrincipales();
     }
 

@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+// Controlador del historial de graduaciones: las entradas están siempre ligadas a un cliente,
+// por eso el único GET es por clienteId y no hay un "listar todos"
 @RestController
 @RequestMapping("/api/historiales")
 public class HistorialController {

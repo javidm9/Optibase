@@ -51,7 +51,7 @@ CREATE DATABASE IF NOT EXISTS optibase_db
 
 ### 3. Configurar las credenciales del backend
 
-Copia la plantilla y rellena con tus valores:
+Las credenciales no están en el repositorio por seguridad. El fichero `application-local.properties` se genera a partir de la plantilla incluida:
 
 ```bash
 # Linux/Mac
@@ -63,7 +63,7 @@ copy backDevelop\src\main\resources\application-local.properties.example ^
      backDevelop\src\main\resources\application-local.properties
 ```
 
-Edita `application-local.properties` con tus valores reales:
+La plantilla contiene las siguientes variables, que se rellenan con los valores del entorno local:
 
 ```properties
 DB_USER=tu_usuario_mysql
@@ -74,13 +74,13 @@ JWT_EXPIRATION=86400000
 CORS_ORIGINS=http://localhost:4200
 ```
 
-> **Importante:** `application-local.properties` está en `.gitignore` y nunca debe subirse al repositorio.
+> `application-local.properties` está en `.gitignore` y no forma parte del repositorio.
 
-> **Generar JWT_SECRET:** En PowerShell: `[Convert]::ToBase64String((1..64 | ForEach-Object { Get-Random -Max 256 }))`
+> El valor de `JWT_SECRET` se puede generar en PowerShell con: `[Convert]::ToBase64String((1..64 | ForEach-Object { Get-Random -Max 256 }))`
 
-### 4. Ejecutar la migración de roles (solo si hay usuarios existentes)
+### 4. Migración de roles (solo si hay usuarios existentes previos)
 
-Si la base de datos ya tiene usuarios creados antes de la versión con roles:
+Si la base de datos contiene usuarios anteriores a la versión con control de roles, el script de migración asigna `ROLE_USER` por defecto y `ROLE_ADMIN` al usuario `admin`:
 
 ```bash
 mysql -u root -p optibase_db < scripts/migration_roles.sql
@@ -149,7 +149,7 @@ El endpoint `/api/auth/login` es público (no requiere token).
 | Encargos      | ✅      | ✅       | Completo     | Pedidos a fábrica, seguimiento de estado |
 | Historial     | ✅      | ✅       | Completo     | Historial de graduaciones por cliente |
 | Estadísticas  | ✅      | ✅       | Completo     | Dashboard con métricas del día y del mes |
-| Usuarios      | ✅      | ❌       | Back listo   | CRUD de usuarios solo accesible desde la API |
+| Usuarios      | ✅      | ✅       | Completo     | CRUD de usuarios con roles, accesible solo para ROLE_ADMIN |
 
 ---
 
@@ -175,7 +175,7 @@ Los backups se guardan en `scripts/backups/` con formato `optibase_YYYYMMDD_HHMM
 scripts\restore.bat scripts\backups\optibase_YYYYMMDD_HHMMSS.sql
 ```
 
-> **Nota de portabilidad:** Los scripts intentan usar `mysqldump`/`mysql` del PATH del sistema. Si no están en el PATH, edita la variable `MYSQL_BIN` al inicio de cada script con la ruta a tu instalación. Ejemplo: `SET MYSQL_BIN=C:\Program Files\MariaDB 11.6\bin`
+> Los scripts utilizan `mysqldump`/`mysql` del PATH del sistema. Si no están en el PATH (el caso habitual en Windows con MariaDB), la variable `MYSQL_BIN` al inicio de cada script apunta a la ruta de instalación. Ejemplo: `SET MYSQL_BIN=C:\Program Files\MariaDB 11.6\bin`
 
 ---
 
@@ -184,7 +184,7 @@ scripts\restore.bat scripts\backups\optibase_YYYYMMDD_HHMMSS.sql
 ```bash
 cd backDevelop
 
-# Todos los tests (usa H2 en memoria, no necesita MySQL arrancado)
+# Todos los tests — usa H2 en memoria, no requiere MySQL
 .\mvnw.cmd test
 
 # Solo tests de autenticación

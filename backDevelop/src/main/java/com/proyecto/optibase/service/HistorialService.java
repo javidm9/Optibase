@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+// Servicio del historial de graduaciones: cada entrada pertenece a un cliente y se guarda con su fecha de revisión
 @Service
 public class HistorialService {
     @Autowired

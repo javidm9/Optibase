@@ -1,3 +1,4 @@
+// Espeja CitaModel del backend; el cliente se incluye embebido para mostrarlo en la tabla sin una segunda petición
 export type EstadoCita = 'PENDIENTE' | 'COMPLETADA' | 'CANCELADA';
 
 export interface Cita {

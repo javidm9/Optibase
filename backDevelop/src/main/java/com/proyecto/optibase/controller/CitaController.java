@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+// Controlador de citas: el servicio se encarga de detectar conflictos de horario antes de guardar
 @RestController
 @RequestMapping("/api/citas")
 public class CitaController {
@@ -27,6 +28,7 @@ public class CitaController {
 
     @PostMapping
     public CitaModel guardar(@Valid @RequestBody CitaModel cita) {
+        // Si ya hay otra cita a la misma hora, el servicio lanza 409 Conflict
         return citaService.guardarCita(cita);
     }
 

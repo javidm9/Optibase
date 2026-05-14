@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { Graduacion } from '../models/graduacion';
 import { environment } from '../../environments/environment';
 
+// Apunta a /api/historiales, que es el nombre que decidí darle al endpoint de graduaciones en el back
 @Injectable({ providedIn: 'root' })
 export class GraduacionService {
   private apiUrl = `${environment.apiUrl}/api/historiales`;

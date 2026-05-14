@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+// Servicio de encargos: sin lógica especial, el repositorio cubre todas las consultas necesarias
 @Service
 public class EncargoService {
     @Autowired

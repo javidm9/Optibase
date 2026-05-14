@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { Cita } from '../models/cita';
 import { environment } from '../../environments/environment';
 
+// El POST puede devolver 409 si ya hay otra cita a la misma hora; el componente muestra el error al usuario
 @Injectable({ providedIn: 'root' })
 export class CitaService {
   private apiUrl = `${environment.apiUrl}/api/citas`;

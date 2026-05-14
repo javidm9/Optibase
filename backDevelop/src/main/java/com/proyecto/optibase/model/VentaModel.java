@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
+// Entidad de venta. Al guardar una venta nueva, VentaService descuenta automáticamente el stock del producto
 @Entity
 @Table(name = "ventas")
 @Data

@@ -114,7 +114,7 @@ La API estará disponible en `http://localhost:8080`.
 
 ## Configuración de base de datos
 
-Las credenciales se inyectan mediante variables de entorno definidas en `application-local.properties` (fichero excluido del repositorio). Copia la plantilla y rellena con tus valores:
+Las credenciales se inyectan mediante variables de entorno definidas en `application-local.properties`, fichero excluido del repositorio por seguridad. La plantilla incluida en el repositorio sirve de base:
 
 ```bash
 # Linux/Mac
@@ -135,7 +135,7 @@ JWT_EXPIRATION=86400000
 CORS_ORIGINS=http://localhost:4200
 ```
 
-> Consulta el README raíz para instrucciones completas de configuración.
+El README raíz incluye instrucciones detalladas sobre cómo generar el `JWT_SECRET` y la migración inicial de datos.
 
 ## Estructura del proyecto
 

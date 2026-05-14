@@ -2,7 +2,7 @@
 
 **Proyecto:** TFG Optibase — ERP para el sector óptico  
 **Versión:** 1.1  
-**Fecha:** 2026-05-14
+**Fecha:** 2026-05-15
 
 ---
 
@@ -48,6 +48,9 @@
 | TC-E2E-10 | Acceder a la ficha de un cliente y ver su historial de graduaciones | Manual | Pestaña Graduaciones muestra las entradas del historial con los datos ópticos correctos | 14/05/2026 | ✅ PASS |
 | TC-E2E-11 | Verificar que ROLE_USER no ve botones de acción en Ventas y Encargos | Manual | Sin botones de creación ni eliminación visibles para el usuario con rol USER | 14/05/2026 | ✅ PASS |
 | TC-E2E-12 | Navegar al módulo Estadísticas y verificar métricas del día | Manual | Dashboard muestra ventas del día, encargos activos, citas de hoy y total de clientes | 14/05/2026 | ✅ PASS |
+| TC-E2E-13 | Acceder a `/usuarios` como ROLE_ADMIN | Manual | El listado de usuarios carga correctamente con ID, nombre y rol de cada usuario | 15/05/2026 | ✅ PASS |
+| TC-E2E-14 | Crear un nuevo usuario desde el módulo de usuarios | Manual | El usuario aparece en el listado con el nombre y rol indicados; la contraseña se almacena como hash BCrypt | 15/05/2026 | ✅ PASS |
+| TC-E2E-15 | Verificar que ROLE_USER no puede acceder a `/usuarios` | Manual | El componente detecta el rol y redirige al menú principal sin mostrar datos de usuarios | 15/05/2026 | ✅ PASS |
 
 ---
 

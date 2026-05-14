@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
+// Entidad de cita clínica. El control de conflictos de horario se gestiona en CitaService, no aquí
 @Entity
 @Table(name = "citas")
 @Data

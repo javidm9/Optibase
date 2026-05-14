@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+// Servicio de clientes: delega directamente en el repositorio porque la lógica de negocio de cliente es sencilla
 @Service
 public class ClienteService {
     @Autowired

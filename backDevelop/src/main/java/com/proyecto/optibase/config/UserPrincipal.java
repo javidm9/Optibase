@@ -1,5 +1,6 @@
 package com.proyecto.optibase.config;
 
+// Objeto auxiliar para transportar los datos del usuario autenticado sin depender de la entidad JPA
 public class UserPrincipal {
     private final String nombre;
     private final String rol;

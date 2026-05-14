@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
+// Entidad de encargo a fábrica. El técnicoAsignado puede ser null si el encargo aún no tiene responsable
 @Entity
 @Table(name = "encargos")
 @Data

@@ -25,8 +25,9 @@ Sistema integral de gestión (ERP) diseñado para el sector óptico. Este direct
 | `/ventas`      | VentasPage          | Registro de ventas, filtros y control de pagos           |
 | `/encargos`    | EncargosPage        | Pedidos a fábrica con seguimiento de estado              |
 | `/estadisticas`| EstadisticasPage    | Dashboard con métricas del día, mes y actividad reciente |
+| `/usuarios`    | UsuariosPage        | CRUD de usuarios del sistema, accesible solo para ROLE_ADMIN |
 
-Todas las rutas excepto `/login` están protegidas por `authGuard`, que verifica el token JWT y su expiración.
+Todas las rutas excepto `/login` están protegidas por `authGuard`, que verifica el token JWT y su expiración. La ruta `/usuarios` aplica además una comprobación interna de rol: si el usuario autenticado no es ROLE_ADMIN, el componente redirige al menú principal.
 
 ---
 
@@ -60,9 +61,7 @@ npm install
 npm start
 ```
 
-La aplicación estará disponible en `http://localhost:4200`.
-
-> El backend debe estar corriendo en `http://localhost:8080` antes de arrancar el frontend.
+La aplicación queda disponible en `http://localhost:4200`. El backend tiene que estar corriendo en `http://localhost:8080` para que las llamadas a la API funcionen.
 
 ### 4. Credenciales de acceso (desarrollo)
 
@@ -87,6 +86,7 @@ src/
 │   │   ├── cliente.ts
 │   │   ├── encargo.ts
 │   │   ├── graduacion.ts
+│   │   ├── usuario.ts
 │   │   └── venta.ts
 │   ├── pages/
 │   │   ├── login/              # Pantalla de acceso al sistema
@@ -96,7 +96,8 @@ src/
 │   │   ├── inventario/         # Stock y catálogo de productos
 │   │   ├── ventas/             # Registro y consulta de ventas
 │   │   ├── encargos/           # Pedidos a proveedores y estado de entrega
-│   │   └── estadisticas/       # Dashboard con resumen operativo
+│   │   ├── estadisticas/       # Dashboard con resumen operativo
+│   │   └── usuarios/           # Gestión de usuarios del sistema (solo ROLE_ADMIN)
 │   ├── services/               # Servicios HTTP que conectan con la API REST
 │   │   ├── auth.service.ts
 │   │   ├── cita.service.ts
@@ -104,6 +105,7 @@ src/
 │   │   ├── encargo.service.ts
 │   │   ├── graduacion.service.ts
 │   │   ├── producto.service.ts
+│   │   ├── usuario.service.ts
 │   │   └── venta.service.ts
 │   ├── app.config.ts           # Configuración de la app (router, HTTP, interceptores)
 │   ├── app.config.server.ts    # Configuración adicional para SSR
