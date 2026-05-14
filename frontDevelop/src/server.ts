@@ -15,10 +15,10 @@ app.use(
   }),
 );
 
-// SPA fallback: cualquier ruta que no sea un fichero estático devuelve index.html
+// SPA fallback: Angular 21 con outputMode:"server" genera index.csr.html (no index.html)
 // Uso app.use en vez de app.get('*') porque path-to-regexp v8 no acepta wildcards sin nombre
 app.use((_req, res) => {
-  res.sendFile(join(browserDistFolder, 'index.html'));
+  res.sendFile(join(browserDistFolder, 'index.csr.html'));
 });
 
 if (isMainModule(import.meta.url) || process.env['pm_id']) {
