@@ -1,6 +1,6 @@
 # OPTIBASE — ERP para el sector óptico
 
-TFG desarrollado con Spring Boot + Angular. Sistema de gestión integral para ópticas: clientes, citas, ventas, inventario y graduaciones.
+TFG desarrollado con Spring Boot + Angular. Sistema de gestión integral para ópticas: clientes, citas, ventas, encargos, inventario, graduaciones y estadísticas.
 
 ---
 
@@ -10,14 +10,15 @@ TFG desarrollado con Spring Boot + Angular. Sistema de gestión integral para ó
 |--------------|------------------------------|----------|
 | Backend      | Spring Boot                  | 4.0.3    |
 | Lenguaje     | Java                         | 17       |
-| Persistencia | Spring Data JPA              | —        |
-| Base de datos| MySQL                        | 8.x      |
+| Persistencia | Spring Data JPA / Hibernate  | —        |
+| Base de datos| MySQL / MariaDB              | 8.x      |
 | Seguridad    | Spring Security + JWT (JJWT) | 0.12.6   |
 | Frontend     | Angular                      | 21.2.0   |
-| Estilos      | Tailwind CSS                 | 4.2      |
+| Estilos      | Tailwind CSS                 | 4.x      |
 | SSR          | Angular Universal + Express  | —        |
 | Build back   | Maven                        | 3.x      |
 | Build front  | Angular CLI / npm            | —        |
+| Despliegue   | Docker + Railway             | —        |
 
 ---
 
@@ -26,7 +27,7 @@ TFG desarrollado con Spring Boot + Angular. Sistema de gestión integral para ó
 - Java 17+
 - Maven 3.6+ (o usar el wrapper `mvnw` incluido)
 - Node.js 20+ y npm
-- MySQL 8.x en ejecución local
+- MySQL/MariaDB en ejecución local
 - (Opcional) Git Bash o WSL para ejecutar los scripts `.sh`
 
 ---
@@ -115,11 +116,11 @@ La aplicación se sirve en `http://localhost:4200`.
 
 ### Credenciales de acceso (entorno de desarrollo)
 
-| Campo      | Valor     |
-|------------|-----------|
-| Usuario    | admin     |
-| Contraseña | admin123  |
-| Rol        | ROLE_ADMIN|
+| Campo      | Valor      |
+|------------|------------|
+| Usuario    | admin      |
+| Contraseña | admin123   |
+| Rol        | ROLE_ADMIN |
 
 ---
 
@@ -132,6 +133,23 @@ La aplicación se sirve en `http://localhost:4200`.
 | Sin token    | ❌ (401)      | ❌ (401)       | ❌ (401)      | ❌ (401)         | ❌ (401)           |
 
 El endpoint `/api/auth/login` es público (no requiere token).
+
+---
+
+## Módulos del sistema
+
+| Módulo        | Backend | Frontend | Estado       | Descripción breve |
+|---------------|:-------:|:--------:|--------------|-------------------|
+| Autenticación | ✅      | ✅       | Completo     | Login JWT, gestión de roles |
+| Roles         | ✅      | ✅       | Completo     | ROLE_ADMIN y ROLE_USER con permisos diferenciados |
+| Clientes      | ✅      | ✅       | Completo     | CRUD completo, búsqueda, ficha con pestañas |
+| Citas         | ✅      | ✅       | Completo     | Agenda con vista lista, semana y mes |
+| Inventario    | ✅      | ✅       | Completo     | Gestión de productos por categoría, stock |
+| Ventas        | ✅      | ✅       | Completo     | Registro de ventas, control de pagos, descuento de stock |
+| Encargos      | ✅      | ✅       | Completo     | Pedidos a fábrica, seguimiento de estado |
+| Historial     | ✅      | ✅       | Completo     | Historial de graduaciones por cliente |
+| Estadísticas  | ✅      | ✅       | Completo     | Dashboard con métricas del día y del mes |
+| Usuarios      | ✅      | ❌       | Back listo   | CRUD de usuarios solo accesible desde la API |
 
 ---
 
@@ -148,16 +166,16 @@ chmod +x scripts/backup.sh
 ./scripts/backup.sh
 ```
 
-Los backups se guardan en `scripts/backups/` con formato `optibase_backup_YYYYMMDD_HHMMSS.sql`.
+Los backups se guardan en `scripts/backups/` con formato `optibase_YYYYMMDD_HHMMSS.sql`.
 
 ### Restaurar un backup
 
 ```bat
 # Windows
-scripts\restore.bat scripts\backups\optibase_backup_YYYYMMDD_HHMMSS.sql
+scripts\restore.bat scripts\backups\optibase_YYYYMMDD_HHMMSS.sql
 ```
 
-> **Nota de portabilidad:** Los scripts intentan usar `mysqldump`/`mysql` del PATH del sistema. Si no están en el PATH (por ejemplo, en instalaciones de MariaDB en Windows que no añaden la carpeta `bin` automáticamente), edita la variable `MYSQL_BIN` al inicio de cada script con la ruta correcta a tu instalación. Ejemplo: `SET MYSQL_BIN=C:\Program Files\MySQL\MySQL Server 8.0\bin`
+> **Nota de portabilidad:** Los scripts intentan usar `mysqldump`/`mysql` del PATH del sistema. Si no están en el PATH, edita la variable `MYSQL_BIN` al inicio de cada script con la ruta a tu instalación. Ejemplo: `SET MYSQL_BIN=C:\Program Files\MariaDB 11.6\bin`
 
 ---
 
@@ -180,19 +198,27 @@ Resultado esperado: `Tests run: 13, Failures: 0, Errors: 0, Skipped: 0`
 
 ---
 
-## Módulos del sistema
+## Despliegue en Railway (Docker)
 
-| Módulo        | Backend | Frontend | Estado       |
-|---------------|:-------:|:--------:|--------------|
-| Autenticación | ✅      | ✅       | Completo     |
-| Roles         | ✅      | ✅       | Completo     |
-| Clientes      | ✅      | ✅       | Completo     |
-| Citas         | ✅      | ✅       | Completo     |
-| Inventario    | ✅      | ✅       | Completo     |
-| Ventas        | ✅      | 🔲       | Back listo   |
-| Encargos      | ✅      | 🔲       | Back listo   |
-| Historial     | ✅      | 🔲       | Back listo   |
-| Usuarios      | ✅      | 🔲       | Back listo   |
+El proyecto incluye Dockerfiles de dos etapas para backend y frontend.
+
+### Backend
+
+```bash
+cd backDevelop
+docker build -t optibase-back .
+```
+
+Variables de entorno requeridas en Railway: `DB_URL`, `DB_USER`, `DB_PASSWORD`, `JWT_SECRET`, `CORS_ORIGINS`.
+
+### Frontend
+
+```bash
+cd frontDevelop
+docker build --build-arg API_URL=https://tu-backend.railway.app -t optibase-front .
+```
+
+Variable de build requerida: `API_URL` (URL pública del backend).
 
 ---
 

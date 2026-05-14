@@ -26,6 +26,9 @@ export class InventarioPage implements OnInit {
   itemsPerPage = 20;
   totalPages = 1;
 
+  sortColumn = '';
+  sortDirection: 'asc' | 'desc' = 'asc';
+
   // Modal Ver / Editar
   articuloSeleccionado: Articulo | null = null;
   modoEdicion = false;
@@ -43,6 +46,7 @@ export class InventarioPage implements OnInit {
     { value: 'MONTURA',  label: 'Montura' },
     { value: 'GAFA_SOL', label: 'Gafa de Sol' },
     { value: 'LIQUIDO',  label: 'Líquido' },
+    { value: 'LENTE',    label: 'Lente' },
   ];
 
   esAdmin = false;
@@ -66,7 +70,7 @@ export class InventarioPage implements OnInit {
         this.cdr.detectChanges();
       },
       error: () => {
-        this.errorCarga = 'No se pudo conectar con el servidor. Verifica que el backend esté activo en localhost:8080.';
+        this.errorCarga = 'No se pudo conectar con el servidor. Verifica la conexión.';
         this.cargando = false;
       }
     });
@@ -84,11 +88,39 @@ export class InventarioPage implements OnInit {
         a.marca.toLowerCase().includes(q)
       );
     }
-    this.totalPages = Math.ceil(resultado.length / this.itemsPerPage) || 1;
+    const sorted = this.applySorting(resultado);
+    this.totalPages = Math.ceil(sorted.length / this.itemsPerPage) || 1;
     if (this.currentPage > this.totalPages) this.currentPage = 1;
     const start = (this.currentPage - 1) * this.itemsPerPage;
-    this.articulosFiltrados = resultado;
-    this.articulosPaginados = resultado.slice(start, start + this.itemsPerPage);
+    this.articulosFiltrados = sorted;
+    this.articulosPaginados = sorted.slice(start, start + this.itemsPerPage);
+  }
+
+  sortBy(column: string) {
+    this.sortDirection = this.sortColumn === column && this.sortDirection === 'asc' ? 'desc' : 'asc';
+    this.sortColumn = column;
+    this.currentPage = 1;
+    this.aplicarFiltros();
+  }
+
+  sortIcon(col: string): string {
+    if (this.sortColumn !== col) return '⇅';
+    return this.sortDirection === 'asc' ? '↑' : '↓';
+  }
+
+  private applySorting(data: Articulo[]): Articulo[] {
+    if (!this.sortColumn) return data;
+    return [...data].sort((a, b) => {
+      let cmp = 0;
+      switch (this.sortColumn) {
+        case 'marca':  cmp = a.marca.localeCompare(b.marca); break;
+        case 'modelo': cmp = a.modelo.localeCompare(b.modelo); break;
+        case 'tipo':   cmp = a.tipo.localeCompare(b.tipo); break;
+        case 'precio': cmp = a.precio - b.precio; break;
+        case 'stock':  cmp = a.stock - b.stock; break;
+      }
+      return this.sortDirection === 'asc' ? cmp : -cmp;
+    });
   }
 
   setCategoriaActiva(cat: string) {
@@ -115,7 +147,6 @@ export class InventarioPage implements OnInit {
 
   stockClass(stock: number): string {
     if (stock <= 0) return 'text-red-600 font-black';
-    if (stock <= 5) return 'text-orange-500 font-bold';
     return 'text-gray-950 font-bold';
   }
 
@@ -237,5 +268,4 @@ export class InventarioPage implements OnInit {
 
   get totalArticulos(): number { return this.articulos.length; }
   get articulosAgotados(): number { return this.articulos.filter(a => a.stock <= 0).length; }
-  get articulosStockBajo(): number { return this.articulos.filter(a => a.stock > 0 && a.stock <= 5).length; }
 }

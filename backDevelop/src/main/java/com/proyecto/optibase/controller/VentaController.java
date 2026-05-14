@@ -14,6 +14,11 @@ public class VentaController {
     @Autowired
     private VentaService ventaService;
     
+    @GetMapping
+    public List<VentaModel> obtenerTodas() {
+        return ventaService.obtenerTodas();
+    }
+
     @GetMapping("/cliente/{clienteId}")
     public List<VentaModel> obtenerPorCliente(@PathVariable Long clienteId) {
         return ventaService.obtenerVentasPorCliente(clienteId);

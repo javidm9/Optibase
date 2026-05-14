@@ -12,6 +12,7 @@ public class ProductoService {
     @Autowired
     private ProductoRepository productoRepository;
 
+    // Solo devuelvo productos principales en el listado general; los recambios se consultan por separado para no saturar la tabla
     public List<ProductoModel> obtenerProductosPrincipales() {
         return productoRepository.findByEsRecambioFalse();
     }

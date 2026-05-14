@@ -12,6 +12,10 @@ public class EncargoService {
     @Autowired
     private EncargoRepository encargoRepository;
 
+    public List<EncargoModel> obtenerTodos() {
+        return encargoRepository.findAll();
+    }
+
     public List<EncargoModel> obtenerPorTipo(String tipo) {
         return encargoRepository.findByTipoEncargo(tipo);
     }

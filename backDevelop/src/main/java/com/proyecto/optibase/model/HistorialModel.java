@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
+// Registro de graduación óptica: OD = ojo derecho, OI = ojo izquierdo, DIP = distancia interpupilar
 @Entity
 @Table(name = "historiales")
 @Data

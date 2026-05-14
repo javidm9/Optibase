@@ -30,6 +30,9 @@ export class CitasPage implements OnInit {
   filtroEstado = '';
   filtroFecha = '';
 
+  sortColumn = '';
+  sortDirection: 'asc' | 'desc' = 'asc';
+
   // Modal Ver / Editar
   citaSeleccionada: Cita | null = null;
   modoEdicion = false;
@@ -58,6 +61,7 @@ export class CitasPage implements OnInit {
   readonly MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
+  // Genero slots de 08:00 a 19:30 cada 30 minutos para el calendario semanal y el selector de hora
   readonly horasSlots: string[] = Array.from({ length: 24 }, (_, i) => {
     const h = 8 + Math.floor(i / 2);
     const m = i % 2 === 0 ? '00' : '30';
@@ -109,18 +113,43 @@ export class CitasPage implements OnInit {
         this.cdr.detectChanges();
       },
       error: () => {
-        this.errorCarga = 'No se pudo conectar con el servidor. Verifica que el backend esté activo en localhost:8080.';
+        this.errorCarga = 'No se pudo conectar con el servidor. Verifica la conexión.';
         this.cargando = false;
       }
     });
   }
 
   aplicarFiltros() {
-    this.citasFiltradas = this.citas.filter(c => {
+    const filtered = this.citas.filter(c => {
       const matchCliente = !this.filtroCliente || this.nombreCliente(c).toLowerCase().includes(this.filtroCliente.toLowerCase());
       const matchEstado  = !this.filtroEstado  || c.estado === this.filtroEstado;
       const matchFecha   = !this.filtroFecha   || this.fechaCita(c) === this.filtroFecha;
       return matchCliente && matchEstado && matchFecha;
+    });
+    this.citasFiltradas = this.applySorting(filtered);
+  }
+
+  sortBy(column: string) {
+    this.sortDirection = this.sortColumn === column && this.sortDirection === 'asc' ? 'desc' : 'asc';
+    this.sortColumn = column;
+    this.aplicarFiltros();
+  }
+
+  sortIcon(col: string): string {
+    if (this.sortColumn !== col) return '⇅';
+    return this.sortDirection === 'asc' ? '↑' : '↓';
+  }
+
+  private applySorting(data: Cita[]): Cita[] {
+    if (!this.sortColumn) return data;
+    return [...data].sort((a, b) => {
+      let cmp = 0;
+      switch (this.sortColumn) {
+        case 'fechaHora': cmp = a.fechaHora.localeCompare(b.fechaHora); break;
+        case 'estado':    cmp = a.estado.localeCompare(b.estado); break;
+        case 'motivo':    cmp = (a.motivo ?? '').localeCompare(b.motivo ?? ''); break;
+      }
+      return this.sortDirection === 'asc' ? cmp : -cmp;
     });
   }
 

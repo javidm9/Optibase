@@ -22,6 +22,9 @@ COPY . .
 # de la variable de build API_URL antes de compilar.
 RUN sed -i "s|apiUrl: ''|apiUrl: '${API_URL}'|g" src/environments/environment.prod.ts
 
+# Validar que API_URL fue proporcionada
+RUN if [ -z "${API_URL}" ]; then echo "WARNING: API_URL no está definida, las llamadas HTTP fallarán en producción"; fi
+
 # Compilar (producción por defecto según angular.json defaultConfiguration)
 RUN npm run build
 

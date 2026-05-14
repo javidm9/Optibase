@@ -2,6 +2,7 @@ import { inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Router, CanActivateFn } from '@angular/router';
 
+// Decodifico el payload del JWT en cliente para no tener que llamar al backend en cada navegación
 function jwtExpirado(token: string): boolean {
   try {
     const payload = JSON.parse(atob(token.split('.')[1]));
@@ -25,6 +26,7 @@ export const authGuard: CanActivateFn = (route, state) => {
     return true;
   }
 
+  // Si el token existe pero está expirado, limpio el storage antes de redirigir al login
   if (token) {
     localStorage.removeItem('userToken');
     localStorage.removeItem('userRol');

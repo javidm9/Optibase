@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 import java.util.Optional;
 
+// Endpoint público de autenticación: no requiere token JWT para acceder
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -25,6 +26,8 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest req) {
         Optional<UsuarioModel> opt = usuarioRepository.findByNombre(req.nombre());
+        // Devuelvo el mismo mensaje tanto si el usuario no existe como si la contraseña es incorrecta
+        // para no dar pistas sobre qué usuarios están registrados
         if (opt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Credenciales incorrectas"));

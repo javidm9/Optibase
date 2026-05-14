@@ -21,6 +21,9 @@ export class Menu {
   irAClientes()   { this.router.navigate(['/clientes']); }
   irACitas()      { this.router.navigate(['/citas']); }
   irAInventario() { this.router.navigate(['/inventario']); }
+  irAVentas()        { this.router.navigate(['/ventas']); }
+  irAEncargos()      { this.router.navigate(['/encargos']); }
+  irAEstadisticas()  { this.router.navigate(['/estadisticas']); }
 
   salir() {
     this.authService.logout();

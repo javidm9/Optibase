@@ -11,8 +11,7 @@
         <h1 class="text-5xl font-black tracking-tighter uppercase italic text-gray-950">Inventario<span
             class="text-gray-400">_</span></h1>
         <p class="text-[9px] font-mono font-bold text-gray-400 tracking-widest leading-none mt-1 uppercase">
-          TOTAL: {{totalArticulos}} // AGOTADOS: <span class="text-red-500">{{articulosAgotados}}</span> // STOCK BAJO:
-          <span class="text-orange-400">{{articulosStockBajo}}</span>
+          TOTAL: {{totalArticulos}} // AGOTADOS: <span class="text-red-500">{{articulosAgotados}}</span>
         </p>
       </div>
     </div>
@@ -24,11 +23,11 @@
     }
   </header>
 
-  <!-- Tabs de categoría + filtro nombre -->
+  <!-- Tabs de categoría: defino el array inline para no necesitar una propiedad extra en el componente -->
   <section class="shrink-0 flex items-end justify-between mb-4">
     <div class="flex gap-0 border-2 border-gray-950">
       @for (tab of [{ value: 'TODOS', label: 'TODOS' }, { value: 'MONTURA', label: 'MONTURAS' }, { value: 'GAFA_SOL',
-      label: 'GAFAS SOL' }, { value: 'LIQUIDO', label: 'LÍQUIDOS' }]; track tab.value) {
+      label: 'GAFAS SOL' }, { value: 'LIQUIDO', label: 'LÍQUIDOS' }, { value: 'LENTE', label: 'LENTES' }]; track tab.value) {
       <button (click)="setCategoriaActiva(tab.value)"
         class="px-5 py-2 text-[10px] font-black uppercase tracking-widest transition-all cursor-pointer border-r-2 border-gray-950 last:border-r-0"
         [class.bg-gray-950]="categoriaActiva === tab.value" [class.text-white]="categoriaActiva === tab.value"
@@ -69,10 +68,10 @@
       <thead class="sticky top-0 bg-gray-200 border-b-2 border-gray-950 z-10">
         <tr class="text-[10px] text-gray-900 uppercase font-black tracking-tight">
           <th class="p-2 w-12 border-r border-gray-300 text-center text-gray-400">ID</th>
-          <th class="p-2 border-r border-gray-300">Modelo / Marca</th>
-          <th class="p-2 w-28 border-r border-gray-300 text-center">Categoría</th>
-          <th class="p-2 w-24 border-r border-gray-300 text-center">Stock</th>
-          <th class="p-2 w-24 border-r border-gray-300 text-right pr-4">Precio</th>
+          <th (click)="sortBy('modelo')" class="p-2 border-r border-gray-300 cursor-pointer select-none hover:bg-gray-300" [class.text-blue-600]="sortColumn==='modelo'">Modelo / Marca {{sortIcon('modelo')}}</th>
+          <th (click)="sortBy('tipo')" class="p-2 w-28 border-r border-gray-300 text-center cursor-pointer select-none hover:bg-gray-300" [class.text-blue-600]="sortColumn==='tipo'">Categoría {{sortIcon('tipo')}}</th>
+          <th (click)="sortBy('stock')" class="p-2 w-24 border-r border-gray-300 text-center cursor-pointer select-none hover:bg-gray-300" [class.text-blue-600]="sortColumn==='stock'">Stock {{sortIcon('stock')}}</th>
+          <th (click)="sortBy('precio')" class="p-2 w-24 border-r border-gray-300 text-right pr-4 cursor-pointer select-none hover:bg-gray-300" [class.text-blue-600]="sortColumn==='precio'">Precio {{sortIcon('precio')}}</th>
           <th class="p-2 w-24 text-right px-4">Acción</th>
         </tr>
       </thead>

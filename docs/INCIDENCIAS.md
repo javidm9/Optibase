@@ -108,7 +108,7 @@ Se añadió `spring.profiles.active=${SPRING_PROFILES_ACTIVE:local}` directament
 | Severidad   | Media                        |
 | Estado      | ✅ Resuelto                  |
 
-**Descripción:**  
+**Descripción:**
 Con Server-Side Rendering (SSR) habilitado en Angular, las llamadas HTTP al backend fallaban durante el renderizado en servidor con errores de CORS o `window is not defined`. Los servicios Angular intentaban llamar a `http://localhost:8080` desde el servidor Node/Express, donde no existe el contexto de navegador.
 
 **Causa raíz:**  
@@ -172,9 +172,9 @@ El servicio Angular `ArticuloService` apuntaba a `/api/articulos`, pero el contr
 El fichero de servicio fue creado con un nombre de endpoint asumido que no coincidía con el controlador backend definido en `ProductoController.java`.
 
 **Solución aplicada:**  
-Renombrado el fichero `articulo.service.ts` a `producto.service.ts` y actualizada la URL base:
+Renombrado el fichero `articulo.service.ts` a `producto.service.ts` y actualizada la URL base para usar la variable de entorno:
 ```typescript
-private apiUrl = 'http://localhost:8080/api/productos';
+private apiUrl = `${environment.apiUrl}/api/productos`;
 ```
 
 ---
@@ -266,3 +266,115 @@ this.service.getAll().subscribe({
   }
 });
 ```
+
+---
+
+## #012 — Variables de entorno no inyectadas en el Dockerfile del frontend
+
+| Campo       | Valor                        |
+|-------------|------------------------------|
+| Fecha       | 2026-05-12                   |
+| Severidad   | Alta                         |
+| Estado      | ✅ Resuelto                  |
+
+**Descripción:**
+Al construir la imagen Docker del frontend sin pasar el argumento `API_URL`, el comando `sed` del Dockerfile sustituía la cadena `__API_URL__` en `environment.prod.ts` por una cadena vacía. La aplicación desplegada en Railway hacía todas las peticiones HTTP a una URL vacía (`/api/...`), devolviendo 404 en todas las llamadas al backend.
+
+**Causa raíz:**
+El `ARG API_URL` en el Dockerfile tiene valor vacío si no se pasa con `--build-arg`. El `RUN sed` se ejecuta igualmente y deja la variable sin valor, sin emitir ningún error visible en el log de build.
+
+**Solución aplicada:**
+Añadido un step de validación en el Dockerfile que emite un `WARNING` explícito si `API_URL` está vacía tras la sustitución, para que el fallo sea visible en los logs de Railway y no llegue a producción silenciosamente:
+```dockerfile
+RUN if [ -z "${API_URL}" ]; then \
+      echo "WARNING: API_URL no está definida, las llamadas HTTP fallarán en producción"; \
+    fi
+```
+
+---
+
+## #013 — `@CrossOrigin` hardcodeado en controladores duplicaba la política CORS
+
+| Campo       | Valor                        |
+|-------------|------------------------------|
+| Fecha       | 2026-05-12                   |
+| Severidad   | Media                        |
+| Estado      | ✅ Resuelto                  |
+
+**Descripción:**
+Algunos controladores (`EncargoController`, `VentaController`) tenían la anotación `@CrossOrigin(origins = "http://localhost:4200")` sobre la clase. En producción (Railway), el origen del frontend es diferente (`https://optibase-front.up.railway.app`), por lo que las peticiones CORS eran bloqueadas aunque `SecurityConfig` estuviera configurada correctamente con la variable de entorno `CORS_ORIGINS`.
+
+**Causa raíz:**
+La anotación `@CrossOrigin` a nivel de controlador tiene mayor precedencia que la configuración global de Spring Security para esa ruta concreta. Al incluir únicamente `localhost:4200`, sobreescribía el valor dinámico de `CORS_ORIGINS` inyectado en `SecurityConfig`.
+
+**Solución aplicada:**
+Eliminada la anotación `@CrossOrigin` de todos los controladores. La política CORS queda centralizada exclusivamente en `SecurityConfig.java`, que lee el origen permitido desde la variable de entorno `CORS_ORIGINS`.
+
+---
+
+## #014 — Contraseña expuesta en respuestas JSON de la API de usuarios
+
+| Campo       | Valor                        |
+|-------------|------------------------------|
+| Fecha       | 2026-05-13                   |
+| Severidad   | Alta                         |
+| Estado      | ✅ Resuelto                  |
+
+**Descripción:**
+El endpoint `GET /api/usuarios` devolvía el hash BCrypt de la contraseña en el cuerpo de la respuesta JSON. Aunque el hash no es la contraseña en texto plano, su exposición innecesaria representa un riesgo de seguridad: facilita ataques offline de fuerza bruta y viola el principio de mínima exposición de datos.
+
+**Causa raíz:**
+`UsuarioModel` serializa todos sus campos por defecto cuando Spring convierte la entidad a JSON. No había ninguna anotación que excluyera el campo `contrasenya` de la serialización.
+
+**Solución aplicada:**
+Añadida la anotación `@JsonIgnore` de Jackson sobre el campo `contrasenya` en `UsuarioModel`:
+```java
+@JsonIgnore
+@NotBlank(message = "Introduzca su contraseña")
+private String contrasenya;
+```
+A partir de este cambio, el campo no aparece en ninguna respuesta de la API, independientemente del endpoint que devuelva un `UsuarioModel`.
+
+---
+
+## #015 — `WebConfig.java` duplicaba la configuración CORS con valores hardcodeados
+
+| Campo       | Valor                        |
+|-------------|------------------------------|
+| Fecha       | 2026-05-13                   |
+| Severidad   | Media                        |
+| Estado      | ✅ Resuelto                  |
+
+**Descripción:**
+Existía un fichero `WebConfig.java` que implementaba `WebMvcConfigurer` y registraba un `CorsRegistry` con `allowedOrigins("http://localhost:4200")` hardcodeado. Esto creaba una segunda fuente de verdad para la política CORS, diferente a la configurada en `SecurityConfig.java` mediante `${CORS_ORIGINS}`. En entornos distintos a desarrollo local, las dos configuraciones podían entrar en conflicto.
+
+**Causa raíz:**
+El fichero fue creado durante las fases iniciales del proyecto como solución rápida a un problema CORS antes de integrar Spring Security. Nunca fue eliminado al centralizar la configuración en `SecurityConfig`.
+
+**Solución aplicada:**
+Eliminado el fichero `WebConfig.java` por completo. La única fuente de verdad para CORS es ahora `SecurityConfig.java`, que lee el origen desde la variable de entorno y aplica la política a todos los endpoints de forma consistente.
+
+---
+
+## #016 — Módulos de Ventas y Encargos no tenían formulario de creación en el frontend
+
+| Campo       | Valor                        |
+|-------------|------------------------------|
+| Fecha       | 2026-05-14                   |
+| Severidad   | Alta                         |
+| Estado      | ✅ Resuelto                  |
+
+**Descripción:**
+Los módulos de Ventas y Encargos mostraban correctamente el listado de registros, pero no incluían ningún formulario para crear nuevas entradas. Los usuarios con `ROLE_ADMIN` no podían registrar ventas ni encargos desde la interfaz web, obligando a usar directamente la API REST.
+
+**Causa raíz:**
+Los componentes `ventas.ts` y `encargos.ts` se implementaron inicialmente en modo solo lectura. El formulario de creación no se añadió en la primera iteración por falta de tiempo.
+
+**Solución aplicada:**
+Añadido un modal de creación a cada módulo, siguiendo el mismo patrón visual brutalista usado en Clientes y Citas:
+- Botón `+ NUEVA VENTA` / `+ NUEVO ENCARGO` visible solo para `ROLE_ADMIN`.
+- Modal con `ngModel` binding para todos los campos del formulario.
+- Selectores que cargan en tiempo real la lista de clientes y productos desde la API.
+- Validación de campos obligatorios antes de enviar la petición.
+- En Ventas: la creación descuenta automáticamente el stock del producto a través de `VentaService.guardarVenta()` en el backend.
+- En Encargos: se envían los IDs de cliente y producto como objetos anidados `{id: X}` para que Hibernate resuelva la relación correctamente.

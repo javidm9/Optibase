@@ -17,6 +17,7 @@ export class AuthService {
   private readonly ROL_KEY    = 'userRol';
   private readonly NOMBRE_KEY = 'userNombre';
   private readonly API_URL    = `${environment.apiUrl}/api/auth/login`;
+  // isBrowser evita que el código que accede a localStorage rompa en SSR (Node.js no tiene window)
   private readonly isBrowser  = isPlatformBrowser(inject(PLATFORM_ID));
 
   constructor(private http: HttpClient) {}
@@ -24,6 +25,7 @@ export class AuthService {
   login(usuario: string, contrasenya: string): Observable<boolean> {
     return this.http.post<LoginResponse>(this.API_URL, { nombre: usuario, contrasenya }).pipe(
       tap(res => {
+        // Guardo token, rol y nombre para que otros componentes los lean sin volver a llamar al backend
         if (this.isBrowser) {
           localStorage.setItem(this.TOKEN_KEY,  res.token);
           localStorage.setItem(this.ROL_KEY,    res.rol);

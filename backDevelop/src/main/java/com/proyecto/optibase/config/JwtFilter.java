@@ -13,6 +13,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.List;
 
+// Filtro que intercepta cada petición, extrae el JWT del header Authorization y autentica al usuario
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
@@ -34,6 +35,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 String username = claims.getSubject();
                 String rol = claims.get("rol", String.class);
 
+                // Si el token no trae rol (cosa que no debería pasar), no asigno authorities para que la autorización falle limpiamente
                 List<SimpleGrantedAuthority> authorities = (rol != null && !rol.isBlank())
                         ? List.of(new SimpleGrantedAuthority(rol))
                         : List.of();
@@ -45,6 +47,7 @@ public class JwtFilter extends OncePerRequestFilter {
             }
         }
 
+        // Si no hay token o no es válido, simplemente sigo la cadena; Spring Security devolverá 401
         filterChain.doFilter(request, response);
     }
 }

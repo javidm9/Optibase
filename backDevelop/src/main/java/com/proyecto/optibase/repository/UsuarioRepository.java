@@ -8,5 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface UsuarioRepository extends JpaRepository<UsuarioModel, Long> {
+    // El login busca por nombre de usuario (no por ID) así que necesito este método derivado
     Optional<UsuarioModel> findByNombre(String nombre);
 }

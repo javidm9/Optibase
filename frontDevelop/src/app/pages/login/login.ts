@@ -26,6 +26,7 @@ export class Login {
       return;
     }
     this.cargando = true;
+    // AuthService guarda token + rol + nombre en localStorage y devuelve true/false según éxito
     this.authService.login(this.usuario, this.password).subscribe(ok => {
       this.cargando = false;
       if (ok) {

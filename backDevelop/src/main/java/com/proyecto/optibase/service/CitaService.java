@@ -23,6 +23,7 @@ public class CitaService {
     }
 
     public CitaModel guardarCita(CitaModel cita) {
+        // Al editar una cita existente excluyo su propio ID para que no se marque como conflicto consigo misma
         boolean hayConflicto = (cita.getId() == null)
                 ? citaRepository.existsByFechaHora(cita.getFechaHora())
                 : citaRepository.existsByFechaHoraAndIdNot(cita.getFechaHora(), cita.getId());

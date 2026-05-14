@@ -94,11 +94,11 @@
       <table class="w-full text-left border-collapse min-w-[900px]">
         <thead class="sticky top-0 bg-gray-200 border-b-2 border-gray-950 z-10">
           <tr class="text-[10px] text-gray-900 uppercase font-black tracking-tight">
-            <th class="p-2 w-36 border-r border-gray-300">Fecha</th>
+            <th (click)="sortBy('fechaHora')" class="p-2 w-36 border-r border-gray-300 cursor-pointer select-none hover:bg-gray-300" [class.text-blue-600]="sortColumn==='fechaHora'">Fecha {{sortIcon('fechaHora')}}</th>
             <th class="p-2 w-20 border-r border-gray-300">Hora</th>
             <th class="p-2 w-64 border-r border-gray-300">Cliente</th>
-            <th class="p-2 border-r border-gray-300">Motivo</th>
-            <th class="p-2 w-32 border-r border-gray-300 text-center">Estado</th>
+            <th (click)="sortBy('motivo')" class="p-2 border-r border-gray-300 cursor-pointer select-none hover:bg-gray-300" [class.text-blue-600]="sortColumn==='motivo'">Motivo {{sortIcon('motivo')}}</th>
+            <th (click)="sortBy('estado')" class="p-2 w-32 border-r border-gray-300 text-center cursor-pointer select-none hover:bg-gray-300" [class.text-blue-600]="sortColumn==='estado'">Estado {{sortIcon('estado')}}</th>
             <th class="p-2 w-24 text-right px-4">Acción</th>
           </tr>
         </thead>

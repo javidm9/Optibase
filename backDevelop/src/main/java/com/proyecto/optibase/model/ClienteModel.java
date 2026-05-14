@@ -21,6 +21,7 @@ public class ClienteModel {
     @NotBlank(message = "Los apellidos son obligatorios")
     private String apellidos;
 
+    // El DNI es único en la tabla y uso la regex oficial española (8 dígitos + letra de control)
     @Pattern(regexp = "^[0-9]{8}[TRWAGMYFPDXBNJZSTQVHLCKE]$", message = "DNI no válido")
     @Column(unique = true, nullable = false)
     private String dni;

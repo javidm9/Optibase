@@ -1,474 +1,645 @@
-<div class="h-screen w-screen bg-gray-100 text-gray-950 p-6 flex flex-col overflow-hidden font-sans border-[3px] border-gray-950 box-border">
+<div
+  class="h-screen w-screen bg-gray-100 text-gray-950 p-6 flex flex-col overflow-hidden font-sans border-[3px] border-gray-950 box-border">
 
   <header class="shrink-0 flex items-center justify-between border-b-2 border-gray-950 pb-3 mb-5">
     <div class="flex items-center gap-6">
-      <button (click)="volverAlMenu()" class="font-mono text-xs font-bold text-gray-400 hover:text-gray-950 border-b-2 border-transparent hover:border-gray-950 transition-colors uppercase tracking-widest cursor-pointer">
+      <button (click)="volverAlMenu()"
+        class="font-mono text-xs font-bold text-gray-400 hover:text-gray-950 border-b-2 border-transparent hover:border-gray-950 transition-colors uppercase tracking-widest cursor-pointer">
         &lt; MENU
       </button>
       <div>
-        <h1 class="text-5xl font-black tracking-tighter uppercase italic text-gray-950">Clientes<span class="text-gray-400">_</span></h1>
-        <p class="text-[9px] font-mono font-bold text-gray-400 tracking-widest leading-none mt-1 uppercase">DATABASE CORE // REGISTROS TOTALES: {{clientesOriginales.length}}</p>
+        <h1 class="text-5xl font-black tracking-tighter uppercase italic text-gray-950">Clientes<span
+            class="text-gray-400">_</span></h1>
+        <p class="text-[9px] font-mono font-bold text-gray-400 tracking-widest leading-none mt-1 uppercase">DATABASE
+          CORE // REGISTROS TOTALES: {{clientesOriginales.length}}</p>
       </div>
     </div>
     @if (esAdmin) {
-      <button (click)="abrirNuevo()" class="bg-white text-gray-950 px-6 py-2.5 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 cursor-pointer">
-        + NUEVO CLIENTE
-      </button>
+    <button (click)="abrirNuevo()"
+      class="bg-white text-gray-950 px-6 py-2.5 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 cursor-pointer">
+      + NUEVO CLIENTE
+    </button>
     }
   </header>
 
   <section class="shrink-0 grid grid-cols-1 md:grid-cols-3 gap-8 mb-6 px-2">
     <div class="border-l-4 border-gray-950 pl-4">
       <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Filtro Nombre</label>
-      <input [(ngModel)]="filtros.nombre" (input)="currentPage=1; applyFilters()" type="text" placeholder="Filtrar por nombre..." class="w-full bg-transparent outline-none py-1 text-sm font-bold">
+      <input [(ngModel)]="filtros.nombre" (input)="currentPage=1; applyFilters()" type="text"
+        placeholder="Filtrar por nombre..." class="w-full bg-transparent outline-none py-1 text-sm font-bold">
     </div>
     <div class="border-l-4 border-gray-950 pl-4">
       <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Filtro Apellidos</label>
-      <input [(ngModel)]="filtros.apellidos" (input)="currentPage=1; applyFilters()" type="text" placeholder="Filtrar por apellidos..." class="w-full bg-transparent outline-none py-1 text-sm font-bold">
+      <input [(ngModel)]="filtros.apellidos" (input)="currentPage=1; applyFilters()" type="text"
+        placeholder="Filtrar por apellidos..." class="w-full bg-transparent outline-none py-1 text-sm font-bold">
     </div>
     <div class="border-l-4 border-gray-950 pl-4">
       <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Filtro DNI</label>
-      <input [(ngModel)]="filtros.dni" (input)="currentPage=1; applyFilters()" type="text" placeholder="Filtrar por DNI..." class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
+      <input [(ngModel)]="filtros.dni" (input)="currentPage=1; applyFilters()" type="text"
+        placeholder="Filtrar por DNI..." class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
     </div>
   </section>
 
   @if (cargando) {
-    <div class="grow flex items-center justify-center">
-      <span class="font-mono font-bold text-gray-400 tracking-widest animate-pulse">Cargando registros...</span>
-    </div>
+  <div class="grow flex items-center justify-center">
+    <span class="font-mono font-bold text-gray-400 tracking-widest animate-pulse">Cargando registros...</span>
+  </div>
   }
 
   @if (errorCarga && !cargando) {
-    <div class="grow flex flex-col items-center justify-center gap-4">
-      <span class="font-mono font-bold text-red-500 text-sm text-center">{{errorCarga}}</span>
-      <button (click)="obtenerClientesDeJava()" class="font-mono text-xs font-bold border-2 border-gray-950 px-4 py-2 hover:bg-gray-950 hover:text-white transition-all uppercase cursor-pointer">
-        REINTENTAR
-      </button>
-    </div>
+  <div class="grow flex flex-col items-center justify-center gap-4">
+    <span class="font-mono font-bold text-red-500 text-sm text-center">{{errorCarga}}</span>
+    <button (click)="obtenerClientesDeJava()"
+      class="font-mono text-xs font-bold border-2 border-gray-950 px-4 py-2 hover:bg-gray-950 hover:text-white transition-all uppercase cursor-pointer">
+      REINTENTAR
+    </button>
+  </div>
   }
 
   @if (!cargando && !errorCarga) {
-    <div class="grow overflow-auto border-2 border-gray-950 bg-white">
-      <table class="w-full text-left border-collapse table-fixed min-w-[1300px]">
-        <thead class="sticky top-0 bg-gray-200 border-b-2 border-gray-950 z-10">
-          <tr class="text-[10px] text-gray-900 uppercase font-black tracking-tight">
-            <th class="p-2 w-14 border-r border-gray-300 text-center text-gray-400">ID</th>
-            <th class="p-2 w-72 border-r border-gray-300 font-bold">Cliente</th>
-            <th class="p-2 w-32 border-r border-gray-300">DNI</th>
-            <th class="p-2 w-36 border-r border-gray-300">Teléfono</th>
-            <th class="p-2 w-48 border-r border-gray-300 italic">Fecha Nac. (Edad)</th>
-            <th class="p-2 border-r border-gray-300">Dirección / Localidad</th>
-            <th class="p-2 w-28 text-right px-4">Acción</th>
-          </tr>
-        </thead>
-        <tbody class="text-[12px] divide-y divide-gray-100">
-          @for (p of paginatedClientes; track p.id) {
-            <tr class="hover:bg-gray-50 transition-colors">
-              <td class="p-2 font-mono text-xs text-gray-400 border-r border-gray-50 text-center text-[10px]">#{{p.id}}</td>
-              <td class="p-2 font-bold text-gray-950 border-r border-gray-50 text-sm">{{p.nombre}} {{p.apellidos}}</td>
-              <td class="p-2 font-mono border-r border-gray-50 font-bold tracking-tighter">{{p.dni}}</td>
-              <td class="p-2 font-mono border-r border-gray-50 text-gray-600">{{p.telefono}}</td>
-              <td class="p-2 border-r border-gray-50 font-mono">{{p.fechaNacimiento}} <span class="text-gray-400 font-bold">({{p.edad}})</span></td>
-              <td class="p-2 border-r border-gray-50 text-gray-500 truncate text-[11px]">{{p.direccion}}, {{p.localidad}} <span class="text-[9px]">[{{p.codigoPostal}}]</span></td>
-              <td class="p-2 text-right px-4">
-                <button (click)="verFicha(p)" class="bg-transparent border border-gray-950 px-3 py-1 text-[9px] font-black uppercase hover:bg-gray-950 hover:text-white transition-all cursor-pointer">
-                  Ver Ficha
-                </button>
-              </td>
-            </tr>
-          } @empty {
-            <tr>
-              <td colspan="7" class="p-8 text-center font-mono text-gray-400 text-xs">SIN RESULTADOS</td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
+  <div class="grow overflow-auto border-2 border-gray-950 bg-white">
+    <table class="w-full text-left border-collapse table-fixed min-w-[1300px]">
+      <thead class="sticky top-0 bg-gray-200 border-b-2 border-gray-950 z-10">
+        <tr class="text-[10px] text-gray-900 uppercase font-black tracking-tight">
+          <th class="p-2 w-14 border-r border-gray-300 text-center text-gray-400">ID</th>
+          <th (click)="sortBy('nombre')" class="p-2 w-72 border-r border-gray-300 font-bold cursor-pointer select-none hover:bg-gray-300" [class.text-blue-600]="sortColumn==='nombre'">Cliente {{sortIcon('nombre')}}</th>
+          <th (click)="sortBy('dni')" class="p-2 w-32 border-r border-gray-300 cursor-pointer select-none hover:bg-gray-300" [class.text-blue-600]="sortColumn==='dni'">DNI {{sortIcon('dni')}}</th>
+          <th class="p-2 w-36 border-r border-gray-300">Teléfono</th>
+          <th (click)="sortBy('fechaNacimiento')" class="p-2 w-48 border-r border-gray-300 italic cursor-pointer select-none hover:bg-gray-300" [class.text-blue-600]="sortColumn==='fechaNacimiento'">Fecha Nac. (Edad) {{sortIcon('fechaNacimiento')}}</th>
+          <th (click)="sortBy('localidad')" class="p-2 border-r border-gray-300 cursor-pointer select-none hover:bg-gray-300" [class.text-blue-600]="sortColumn==='localidad'">Dirección / Localidad {{sortIcon('localidad')}}</th>
+          <th class="p-2 w-28 text-right px-4">Acción</th>
+        </tr>
+      </thead>
+      <tbody class="text-[12px] divide-y divide-gray-100">
+        @for (p of paginatedClientes; track p.id) {
+        <tr class="hover:bg-gray-50 transition-colors">
+          <td class="p-2 font-mono text-xs text-gray-400 border-r border-gray-50 text-center text-[10px]">#{{p.id}}</td>
+          <td class="p-2 font-bold text-gray-950 border-r border-gray-50 text-sm">{{p.nombre}} {{p.apellidos}}</td>
+          <td class="p-2 font-mono border-r border-gray-50 font-bold tracking-tighter">{{p.dni}}</td>
+          <td class="p-2 font-mono border-r border-gray-50 text-gray-600">{{p.telefono}}</td>
+          <td class="p-2 border-r border-gray-50 font-mono">{{p.fechaNacimiento}} <span
+              class="text-gray-400 font-bold">({{p.edad}})</span></td>
+          <td class="p-2 border-r border-gray-50 text-gray-500 truncate text-[11px]">{{p.direccion}}, {{p.localidad}}
+            <span class="text-[9px]">[{{p.codigoPostal}}]</span>
+          </td>
+          <td class="p-2 text-right px-4">
+            <button (click)="verFicha(p)"
+              class="bg-transparent border border-gray-950 px-3 py-1 text-[9px] font-black uppercase hover:bg-gray-950 hover:text-white transition-all cursor-pointer">
+              Ver Ficha
+            </button>
+          </td>
+        </tr>
+        } @empty {
+        <tr>
+          <td colspan="7" class="p-8 text-center font-mono text-gray-400 text-xs">SIN RESULTADOS</td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
 
-    <footer class="shrink-0 flex items-center justify-between pt-4 font-mono">
-      <div class="flex items-center gap-8 text-[9px] font-black text-gray-300 uppercase">
-        <span>Results: {{filteredClientes.length}}</span>
+  <footer class="shrink-0 flex items-center justify-between pt-4 font-mono">
+    <div class="flex items-center gap-8 text-[9px] font-black text-gray-300 uppercase">
+      <span>Results: {{filteredClientes.length}}</span>
+    </div>
+    <div class="flex items-center border-2 border-gray-950 bg-white">
+      <button (click)="prevPage()" [disabled]="currentPage === 1"
+        class="px-4 py-1.5 text-[10px] font-black hover:bg-gray-950 hover:text-white disabled:opacity-20 border-r-2 border-gray-950 transition-all uppercase cursor-pointer">
+        &lt;&lt; Prev
+      </button>
+      <div class="px-6 py-1.5 text-[10px] font-black bg-gray-100 flex items-center gap-3">
+        <span class="text-gray-400 font-bold">PÁG.</span>
+        <span class="text-sm font-black">{{currentPage}}</span>
+        <span class="text-gray-400">/</span>
+        <span class="font-bold">{{totalPages}}</span>
       </div>
-      <div class="flex items-center border-2 border-gray-950 bg-white">
-        <button (click)="prevPage()" [disabled]="currentPage === 1"
-                class="px-4 py-1.5 text-[10px] font-black hover:bg-gray-950 hover:text-white disabled:opacity-20 border-r-2 border-gray-950 transition-all uppercase cursor-pointer">
-          &lt;&lt; Prev
-        </button>
-        <div class="px-6 py-1.5 text-[10px] font-black bg-gray-100 flex items-center gap-3">
-          <span class="text-gray-400 font-bold">PÁG.</span>
-          <span class="text-sm font-black">{{currentPage}}</span>
-          <span class="text-gray-400">/</span>
-          <span class="font-bold">{{totalPages}}</span>
-        </div>
-        <button (click)="nextPage()" [disabled]="currentPage === totalPages"
-                class="px-4 py-1.5 text-[10px] font-black hover:bg-gray-950 hover:text-white disabled:opacity-20 border-l-2 border-gray-950 transition-all uppercase cursor-pointer">
-          Next &gt;&gt;
-        </button>
-      </div>
-    </footer>
+      <button (click)="nextPage()" [disabled]="currentPage === totalPages"
+        class="px-4 py-1.5 text-[10px] font-black hover:bg-gray-950 hover:text-white disabled:opacity-20 border-l-2 border-gray-950 transition-all uppercase cursor-pointer">
+        Next &gt;&gt;
+      </button>
+    </div>
+  </footer>
   }
 </div>
 
 
 <!-- ======================== MODAL FICHA CLIENTE ======================== -->
 @if (clienteSeleccionado) {
-  <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-    <div class="bg-gray-100 border-4 border-gray-950 w-full max-w-2xl max-h-[90vh] overflow-y-auto flex flex-col">
+<div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+  <div class="bg-gray-100 border-4 border-gray-950 w-full max-w-4xl max-h-[90vh] overflow-y-auto flex flex-col">
 
-      <!-- Header -->
-      <div class="flex items-start justify-between border-b-4 border-gray-950 p-6 pb-0 shrink-0">
-        <div class="pb-4">
-          <span class="font-mono text-[10px] text-blue-600 font-black tracking-widest block mb-1">FICHA CLIENTE #{{clienteSeleccionado.id}}</span>
-          <h2 class="text-3xl font-black tracking-tighter uppercase">{{clienteSeleccionado.nombre}} {{clienteSeleccionado.apellidos}}</h2>
-        </div>
-        <button (click)="cerrarFicha()" class="font-mono font-bold text-gray-400 hover:text-gray-950 text-sm tracking-widest cursor-pointer ml-4 mt-1">[ X ]</button>
+    <!-- Header -->
+    <div class="flex items-start justify-between border-b-4 border-gray-950 p-6 pb-0 shrink-0">
+      <div class="pb-4">
+        <span class="font-mono text-[10px] text-blue-600 font-black tracking-widest block mb-1">FICHA CLIENTE
+          #{{clienteSeleccionado.id}}</span>
+        <h2 class="text-3xl font-black tracking-tighter uppercase">{{clienteSeleccionado.nombre}}
+          {{clienteSeleccionado.apellidos}}</h2>
+      </div>
+      <button (click)="cerrarFicha()"
+        class="font-mono font-bold text-gray-400 hover:text-gray-950 text-sm tracking-widest cursor-pointer ml-4 mt-1">[
+        X ]</button>
+    </div>
+
+    <!-- Tabs -->
+    @if (!modoEdicion) {
+    <div class="flex border-b-2 border-gray-950 shrink-0">
+      <button (click)="cambiarVista('datos')"
+        class="px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-all cursor-pointer border-r-2 border-gray-950"
+        [class.bg-gray-950]="vistaFicha === 'datos'" [class.text-white]="vistaFicha === 'datos'"
+        [class.text-gray-500]="vistaFicha !== 'datos'">
+        DATOS
+      </button>
+      <button (click)="cambiarVista('graduaciones')"
+        class="px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-all cursor-pointer border-r-2 border-gray-950"
+        [class.bg-gray-950]="vistaFicha === 'graduaciones'" [class.text-white]="vistaFicha === 'graduaciones'"
+        [class.text-gray-500]="vistaFicha !== 'graduaciones'">
+        GRADUACIONES
+      </button>
+      <button (click)="cambiarVista('citas')"
+        class="px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-all cursor-pointer border-r-2 border-gray-950"
+        [class.bg-gray-950]="vistaFicha === 'citas'" [class.text-white]="vistaFicha === 'citas'"
+        [class.text-gray-500]="vistaFicha !== 'citas'">
+        CITAS
+      </button>
+      <button (click)="cambiarVista('ventas')"
+        class="px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-all cursor-pointer"
+        [class.bg-gray-950]="vistaFicha === 'ventas'" [class.text-white]="vistaFicha === 'ventas'"
+        [class.text-gray-500]="vistaFicha !== 'ventas'">
+        VENTAS
+      </button>
+    </div>
+    }
+
+    <!-- Vista: DATOS (solo lectura) -->
+    @if (vistaFicha === 'datos' && !modoEdicion) {
+    <div class="p-6 grid grid-cols-2 gap-x-8 gap-y-5 grow">
+      <div>
+        <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">DNI</span>
+        <span class="font-mono font-bold text-sm">{{clienteSeleccionado.dni}}</span>
+      </div>
+      <div>
+        <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Teléfono</span>
+        <span class="font-mono font-bold text-sm">{{clienteSeleccionado.telefono}}</span>
+      </div>
+      <div>
+        <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Fecha Nacimiento</span>
+        <span class="font-mono font-bold text-sm">{{clienteSeleccionado.fechaNacimiento}}</span>
+      </div>
+      <div>
+        <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Edad</span>
+        <span class="font-mono font-bold text-sm">{{clienteSeleccionado.edad}}</span>
+      </div>
+      <div class="col-span-2">
+        <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Dirección</span>
+        <span class="font-bold text-sm">{{clienteSeleccionado.direccion}}</span>
+      </div>
+      <div>
+        <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Localidad</span>
+        <span class="font-bold text-sm">{{clienteSeleccionado.localidad}}</span>
+      </div>
+      <div>
+        <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Provincia</span>
+        <span class="font-bold text-sm">{{clienteSeleccionado.provincia}}</span>
+      </div>
+      <div>
+        <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">C.P.</span>
+        <span class="font-mono font-bold text-sm">{{clienteSeleccionado.codigoPostal}}</span>
+      </div>
+    </div>
+    }
+
+    <!-- Vista: DATOS (edición) -->
+    @if (modoEdicion) {
+    <div class="p-6 grid grid-cols-2 gap-x-8 gap-y-4 grow">
+      <div class="border-b-2 border-gray-950">
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Nombre</label>
+        <input [(ngModel)]="clienteEditando.nombre" class="w-full bg-transparent outline-none py-1 text-sm font-bold">
+      </div>
+      <div class="border-b-2 border-gray-950">
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Apellidos</label>
+        <input [(ngModel)]="clienteEditando.apellidos"
+          class="w-full bg-transparent outline-none py-1 text-sm font-bold">
+      </div>
+      <div class="border-b-2 border-gray-950">
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">DNI</label>
+        <input [(ngModel)]="clienteEditando.dni"
+          class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
+      </div>
+      <div class="border-b-2 border-gray-950">
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Teléfono</label>
+        <input [(ngModel)]="clienteEditando.telefono"
+          class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
+      </div>
+      <div class="border-b-2 border-gray-950">
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Fecha Nacimiento</label>
+        <input [(ngModel)]="clienteEditando.fechaNacimiento" type="date"
+          class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
+      </div>
+      <div class="border-b-2 border-gray-950">
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Edad</label>
+        <input [(ngModel)]="clienteEditando.edad"
+          class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
+      </div>
+      <div class="col-span-2 border-b-2 border-gray-950">
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Dirección</label>
+        <input [(ngModel)]="clienteEditando.direccion"
+          class="w-full bg-transparent outline-none py-1 text-sm font-bold">
+      </div>
+      <div class="border-b-2 border-gray-950">
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Localidad</label>
+        <input [(ngModel)]="clienteEditando.localidad"
+          class="w-full bg-transparent outline-none py-1 text-sm font-bold">
+      </div>
+      <div class="border-b-2 border-gray-950">
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Provincia</label>
+        <input [(ngModel)]="clienteEditando.provincia"
+          class="w-full bg-transparent outline-none py-1 text-sm font-bold">
+      </div>
+      <div class="border-b-2 border-gray-950">
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">C.P.</label>
+        <input [(ngModel)]="clienteEditando.codigoPostal"
+          class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
+      </div>
+    </div>
+    }
+
+    <!-- Vista: GRADUACIONES -->
+    @if (vistaFicha === 'graduaciones' && !modoEdicion) {
+    <div class="p-6 grow flex flex-col gap-4">
+
+      <div class="flex items-center justify-between">
+        <span class="font-mono text-[10px] font-black text-gray-400 uppercase tracking-widest">HISTORIAL CRONOLÓGICO
+          ({{graduaciones.length}} registros)</span>
+        @if (!mostrarFormGraduacion) {
+        <button (click)="abrirFormGraduacion()"
+          class="font-mono text-[9px] font-black border-2 border-gray-950 px-3 py-1.5 hover:bg-gray-950 hover:text-white transition-all uppercase cursor-pointer">
+          + NUEVA GRADUACIÓN
+        </button>
+        }
       </div>
 
-      <!-- Tabs -->
-      @if (!modoEdicion) {
-        <div class="flex border-b-2 border-gray-950 shrink-0">
-          <button (click)="cambiarVista('datos')"
-                  class="px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-all cursor-pointer border-r-2 border-gray-950"
-                  [class.bg-gray-950]="vistaFicha === 'datos'"
-                  [class.text-white]="vistaFicha === 'datos'"
-                  [class.text-gray-500]="vistaFicha !== 'datos'">
-            DATOS
-          </button>
-          <button (click)="cambiarVista('graduaciones')"
-                  class="px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-all cursor-pointer"
-                  [class.bg-gray-950]="vistaFicha === 'graduaciones'"
-                  [class.text-white]="vistaFicha === 'graduaciones'"
-                  [class.text-gray-500]="vistaFicha !== 'graduaciones'">
-            GRADUACIONES
-          </button>
-        </div>
-      }
-
-      <!-- Vista: DATOS (solo lectura) -->
-      @if (vistaFicha === 'datos' && !modoEdicion) {
-        <div class="p-6 grid grid-cols-2 gap-x-8 gap-y-5 grow">
+      <!-- Formulario nueva graduación -->
+      @if (mostrarFormGraduacion) {
+      <div class="border-2 border-blue-600 p-4 bg-white">
+        <p class="font-mono text-[9px] font-black text-blue-600 uppercase tracking-widest mb-3">NUEVA GRADUACIÓN</p>
+        <div class="grid grid-cols-2 gap-x-6 gap-y-3 mb-4">
+          <div class="col-span-2 border-b-2 border-gray-950">
+            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Fecha</label>
+            <input [(ngModel)]="nuevaGraduacion.fechaRevision" type="date"
+              class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
+          </div>
+          <!-- OD -->
           <div>
-            <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">DNI</span>
-            <span class="font-mono font-bold text-sm">{{clienteSeleccionado.dni}}</span>
+            <p class="text-[9px] font-black text-gray-950 uppercase tracking-widest mb-2 border-b border-gray-300 pb-1">
+              OJO DERECHO</p>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[8px] text-gray-400 uppercase">Esfera</label>
+                <input [(ngModel)]="nuevaGraduacion.odEsfera" type="number" step="0.25"
+                  class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
+              </div>
+              <div>
+                <label class="block text-[8px] text-gray-400 uppercase">Cilindro</label>
+                <input [(ngModel)]="nuevaGraduacion.odCilindro" type="number" step="0.25"
+                  class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
+              </div>
+              <div>
+                <label class="block text-[8px] text-gray-400 uppercase">Eje</label>
+                <input [(ngModel)]="nuevaGraduacion.odEje" type="number" step="1" min="0" max="180"
+                  class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
+              </div>
+              <div>
+                <label class="block text-[8px] text-gray-400 uppercase">Adición</label>
+                <input [(ngModel)]="nuevaGraduacion.odAdicion" type="number" step="0.25"
+                  class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
+              </div>
+              <div class="col-span-2">
+                <label class="block text-[8px] text-gray-400 uppercase">Agudeza Visual OD</label>
+                <input [(ngModel)]="nuevaGraduacion.avOd" type="number" step="0.1" min="0" max="2"
+                  class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
+              </div>
+            </div>
           </div>
+          <!-- OI -->
           <div>
-            <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Teléfono</span>
-            <span class="font-mono font-bold text-sm">{{clienteSeleccionado.telefono}}</span>
-          </div>
-          <div>
-            <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Fecha Nacimiento</span>
-            <span class="font-mono font-bold text-sm">{{clienteSeleccionado.fechaNacimiento}}</span>
-          </div>
-          <div>
-            <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Edad</span>
-            <span class="font-mono font-bold text-sm">{{clienteSeleccionado.edad}}</span>
-          </div>
-          <div class="col-span-2">
-            <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Dirección</span>
-            <span class="font-bold text-sm">{{clienteSeleccionado.direccion}}</span>
-          </div>
-          <div>
-            <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Localidad</span>
-            <span class="font-bold text-sm">{{clienteSeleccionado.localidad}}</span>
-          </div>
-          <div>
-            <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Provincia</span>
-            <span class="font-bold text-sm">{{clienteSeleccionado.provincia}}</span>
-          </div>
-          <div>
-            <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">C.P.</span>
-            <span class="font-mono font-bold text-sm">{{clienteSeleccionado.codigoPostal}}</span>
-          </div>
-        </div>
-      }
-
-      <!-- Vista: DATOS (edición) -->
-      @if (modoEdicion) {
-        <div class="p-6 grid grid-cols-2 gap-x-8 gap-y-4 grow">
-          <div class="border-b-2 border-gray-950">
-            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Nombre</label>
-            <input [(ngModel)]="clienteEditando.nombre" class="w-full bg-transparent outline-none py-1 text-sm font-bold">
-          </div>
-          <div class="border-b-2 border-gray-950">
-            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Apellidos</label>
-            <input [(ngModel)]="clienteEditando.apellidos" class="w-full bg-transparent outline-none py-1 text-sm font-bold">
-          </div>
-          <div class="border-b-2 border-gray-950">
-            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">DNI</label>
-            <input [(ngModel)]="clienteEditando.dni" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
-          </div>
-          <div class="border-b-2 border-gray-950">
-            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Teléfono</label>
-            <input [(ngModel)]="clienteEditando.telefono" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
-          </div>
-          <div class="border-b-2 border-gray-950">
-            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Fecha Nacimiento</label>
-            <input [(ngModel)]="clienteEditando.fechaNacimiento" type="date" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
-          </div>
-          <div class="border-b-2 border-gray-950">
-            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Edad</label>
-            <input [(ngModel)]="clienteEditando.edad" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
+            <p class="text-[9px] font-black text-gray-950 uppercase tracking-widest mb-2 border-b border-gray-300 pb-1">
+              OJO IZQUIERDO</p>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[8px] text-gray-400 uppercase">Esfera</label>
+                <input [(ngModel)]="nuevaGraduacion.oiEsfera" type="number" step="0.25"
+                  class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
+              </div>
+              <div>
+                <label class="block text-[8px] text-gray-400 uppercase">Cilindro</label>
+                <input [(ngModel)]="nuevaGraduacion.oiCilindro" type="number" step="0.25"
+                  class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
+              </div>
+              <div>
+                <label class="block text-[8px] text-gray-400 uppercase">Eje</label>
+                <input [(ngModel)]="nuevaGraduacion.oiEje" type="number" step="1" min="0" max="180"
+                  class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
+              </div>
+              <div>
+                <label class="block text-[8px] text-gray-400 uppercase">Adición</label>
+                <input [(ngModel)]="nuevaGraduacion.oiAdicion" type="number" step="0.25"
+                  class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
+              </div>
+              <div class="col-span-2">
+                <label class="block text-[8px] text-gray-400 uppercase">Agudeza Visual OI</label>
+                <input [(ngModel)]="nuevaGraduacion.avOi" type="number" step="0.1" min="0" max="2"
+                  class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
+              </div>
+            </div>
           </div>
           <div class="col-span-2 border-b-2 border-gray-950">
-            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Dirección</label>
-            <input [(ngModel)]="clienteEditando.direccion" class="w-full bg-transparent outline-none py-1 text-sm font-bold">
+            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Distancia Interpupilar
+              (mm)</label>
+            <input [(ngModel)]="nuevaGraduacion.dip" type="number" step="0.5" min="50" max="80"
+              class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
           </div>
-          <div class="border-b-2 border-gray-950">
-            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Localidad</label>
-            <input [(ngModel)]="clienteEditando.localidad" class="w-full bg-transparent outline-none py-1 text-sm font-bold">
-          </div>
-          <div class="border-b-2 border-gray-950">
-            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Provincia</label>
-            <input [(ngModel)]="clienteEditando.provincia" class="w-full bg-transparent outline-none py-1 text-sm font-bold">
-          </div>
-          <div class="border-b-2 border-gray-950">
-            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">C.P.</label>
-            <input [(ngModel)]="clienteEditando.codigoPostal" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
+          <div class="col-span-2 border-b-2 border-gray-950">
+            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Observaciones</label>
+            <input [(ngModel)]="nuevaGraduacion.observaciones" class="w-full bg-transparent outline-none py-1 text-sm"
+              placeholder="Notas opcionales...">
           </div>
         </div>
-      }
-
-      <!-- Vista: GRADUACIONES -->
-      @if (vistaFicha === 'graduaciones' && !modoEdicion) {
-        <div class="p-6 grow flex flex-col gap-4">
-
-          <div class="flex items-center justify-between">
-            <span class="font-mono text-[10px] font-black text-gray-400 uppercase tracking-widest">HISTORIAL CRONOLÓGICO ({{graduaciones.length}} registros)</span>
-            @if (!mostrarFormGraduacion) {
-              <button (click)="abrirFormGraduacion()" class="font-mono text-[9px] font-black border-2 border-gray-950 px-3 py-1.5 hover:bg-gray-950 hover:text-white transition-all uppercase cursor-pointer">
-                + NUEVA GRADUACIÓN
-              </button>
-            }
-          </div>
-
-          <!-- Formulario nueva graduación -->
-          @if (mostrarFormGraduacion) {
-            <div class="border-2 border-blue-600 p-4 bg-white">
-              <p class="font-mono text-[9px] font-black text-blue-600 uppercase tracking-widest mb-3">NUEVA GRADUACIÓN</p>
-              <div class="grid grid-cols-2 gap-x-6 gap-y-3 mb-4">
-                <div class="col-span-2 border-b-2 border-gray-950">
-                  <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Fecha</label>
-                  <input [(ngModel)]="nuevaGraduacion.fechaRevision" type="date" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
-                </div>
-                <!-- OD -->
-                <div>
-                  <p class="text-[9px] font-black text-gray-950 uppercase tracking-widest mb-2 border-b border-gray-300 pb-1">OJO DERECHO</p>
-                  <div class="grid grid-cols-2 gap-2">
-                    <div>
-                      <label class="block text-[8px] text-gray-400 uppercase">Esfera</label>
-                      <input [(ngModel)]="nuevaGraduacion.odEsfera" type="number" step="0.25" class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
-                    </div>
-                    <div>
-                      <label class="block text-[8px] text-gray-400 uppercase">Cilindro</label>
-                      <input [(ngModel)]="nuevaGraduacion.odCilindro" type="number" step="0.25" class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
-                    </div>
-                    <div>
-                      <label class="block text-[8px] text-gray-400 uppercase">Eje</label>
-                      <input [(ngModel)]="nuevaGraduacion.odEje" type="number" step="1" min="0" max="180" class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
-                    </div>
-                    <div>
-                      <label class="block text-[8px] text-gray-400 uppercase">Adición</label>
-                      <input [(ngModel)]="nuevaGraduacion.odAdicion" type="number" step="0.25" class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
-                    </div>
-                    <div class="col-span-2">
-                      <label class="block text-[8px] text-gray-400 uppercase">Agudeza Visual OD</label>
-                      <input [(ngModel)]="nuevaGraduacion.avOd" type="number" step="0.1" min="0" max="2" class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
-                    </div>
-                  </div>
-                </div>
-                <!-- OI -->
-                <div>
-                  <p class="text-[9px] font-black text-gray-950 uppercase tracking-widest mb-2 border-b border-gray-300 pb-1">OJO IZQUIERDO</p>
-                  <div class="grid grid-cols-2 gap-2">
-                    <div>
-                      <label class="block text-[8px] text-gray-400 uppercase">Esfera</label>
-                      <input [(ngModel)]="nuevaGraduacion.oiEsfera" type="number" step="0.25" class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
-                    </div>
-                    <div>
-                      <label class="block text-[8px] text-gray-400 uppercase">Cilindro</label>
-                      <input [(ngModel)]="nuevaGraduacion.oiCilindro" type="number" step="0.25" class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
-                    </div>
-                    <div>
-                      <label class="block text-[8px] text-gray-400 uppercase">Eje</label>
-                      <input [(ngModel)]="nuevaGraduacion.oiEje" type="number" step="1" min="0" max="180" class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
-                    </div>
-                    <div>
-                      <label class="block text-[8px] text-gray-400 uppercase">Adición</label>
-                      <input [(ngModel)]="nuevaGraduacion.oiAdicion" type="number" step="0.25" class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
-                    </div>
-                    <div class="col-span-2">
-                      <label class="block text-[8px] text-gray-400 uppercase">Agudeza Visual OI</label>
-                      <input [(ngModel)]="nuevaGraduacion.avOi" type="number" step="0.1" min="0" max="2" class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
-                    </div>
-                  </div>
-                </div>
-                <div class="col-span-2 border-b-2 border-gray-950">
-                  <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Distancia Interpupilar (mm)</label>
-                  <input [(ngModel)]="nuevaGraduacion.dip" type="number" step="0.5" min="50" max="80" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
-                </div>
-                <div class="col-span-2 border-b-2 border-gray-950">
-                  <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Observaciones</label>
-                  <input [(ngModel)]="nuevaGraduacion.observaciones" class="w-full bg-transparent outline-none py-1 text-sm" placeholder="Notas opcionales...">
-                </div>
-              </div>
-              @if (errorGraduacion) {
-                <p class="font-mono text-xs text-red-500 font-bold mb-2">ERROR: {{errorGraduacion}}</p>
-              }
-              <div class="flex gap-3">
-                <button (click)="guardarGraduacion()" [disabled]="creandoGraduacion" class="px-4 py-1.5 font-black text-[10px] uppercase bg-gray-950 text-white hover:bg-blue-600 transition-all cursor-pointer disabled:opacity-50">
-                  {{creandoGraduacion ? 'GUARDANDO...' : 'GUARDAR'}}
-                </button>
-                <button (click)="cancelarFormGraduacion()" class="px-4 py-1.5 font-black text-[10px] uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all cursor-pointer">
-                  CANCELAR
-                </button>
-              </div>
-            </div>
-          }
-
-          <!-- Lista de graduaciones -->
-          @if (cargandoGraduaciones) {
-            <span class="font-mono text-xs text-gray-400 animate-pulse">Cargando historial...</span>
-          } @else if (graduaciones.length === 0) {
-            <p class="font-mono text-xs text-gray-400 uppercase tracking-widest text-center py-6">SIN REGISTROS DE GRADUACIÓN</p>
-          } @else {
-            <div class="overflow-x-auto">
-              <table class="w-full text-left border-collapse min-w-[600px]">
-                <thead class="bg-gray-200 border-b-2 border-gray-950">
-                  <tr class="text-[9px] font-black uppercase tracking-tight text-gray-500">
-                    <th class="p-2 border-r border-gray-300">Fecha</th>
-                    <th class="p-2 border-r border-gray-300 text-center" colspan="3">OD (Esf / Cil / Eje)</th>
-                    <th class="p-2 border-r border-gray-300 text-center" colspan="3">OI (Esf / Cil / Eje)</th>
-                    <th class="p-2 border-r border-gray-300">Obs.</th>
-                    <th class="p-2"></th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100 text-[11px]">
-                  @for (g of graduaciones; track g.id) {
-                    <tr class="hover:bg-gray-50">
-                      <td class="p-2 font-mono font-bold border-r border-gray-100">{{g.fechaRevision}}</td>
-                      <td class="p-2 font-mono text-center border-r border-gray-100" colspan="3">
-                        <span [class.text-red-500]="g.odEsfera < 0">{{g.odEsfera > 0 ? '+' : ''}}{{g.odEsfera}}</span>
-                        / {{g.odCilindro}} / {{g.odEje}}°
-                      </td>
-                      <td class="p-2 font-mono text-center border-r border-gray-100" colspan="3">
-                        <span [class.text-red-500]="g.oiEsfera < 0">{{g.oiEsfera > 0 ? '+' : ''}}{{g.oiEsfera}}</span>
-                        / {{g.oiCilindro}} / {{g.oiEje}}°
-                      </td>
-                      <td class="p-2 text-gray-500 border-r border-gray-100 text-[10px] max-w-[100px] truncate">{{g.observaciones || '—'}}</td>
-                      <td class="p-2 text-right">
-                        <button (click)="eliminarGraduacion(g)" class="text-[9px] font-black text-red-400 hover:text-red-600 uppercase font-mono cursor-pointer">DEL</button>
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-          }
-        </div>
-      }
-
-      @if (errorModal) {
-        <div class="px-6 pb-2">
-          <span class="font-mono text-xs text-red-500 font-bold">ERROR: {{errorModal}}</span>
-        </div>
-      }
-
-      <!-- Footer de acciones -->
-      <div class="border-t-4 border-gray-950 p-4 flex gap-3 shrink-0">
-        @if (vistaFicha === 'datos' && !modoEdicion && esAdmin) {
-          <button (click)="iniciarEdicion()" class="px-6 py-2 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all cursor-pointer">
-            EDITAR
-          </button>
-          <button (click)="eliminarCliente(clienteSeleccionado!)" class="px-6 py-2 font-black text-xs uppercase border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white transition-all cursor-pointer">
-            ELIMINAR
-          </button>
+        @if (errorGraduacion) {
+        <p class="font-mono text-xs text-red-500 font-bold mb-2">ERROR: {{errorGraduacion}}</p>
         }
-        @if (modoEdicion) {
-          <button (click)="guardarCambios()" [disabled]="guardando" class="px-6 py-2 font-black text-xs uppercase bg-gray-950 text-white hover:bg-blue-600 transition-all cursor-pointer disabled:opacity-50">
-            {{guardando ? 'GUARDANDO...' : 'GUARDAR CAMBIOS'}}
+        <div class="flex gap-3">
+          <button (click)="guardarGraduacion()" [disabled]="creandoGraduacion"
+            class="px-4 py-1.5 font-black text-[10px] uppercase bg-gray-950 text-white hover:bg-blue-600 transition-all cursor-pointer disabled:opacity-50">
+            {{creandoGraduacion ? 'GUARDANDO...' : 'GUARDAR'}}
           </button>
-          <button (click)="cancelarEdicion()" class="px-6 py-2 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all cursor-pointer">
+          <button (click)="cancelarFormGraduacion()"
+            class="px-4 py-1.5 font-black text-[10px] uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all cursor-pointer">
             CANCELAR
           </button>
-        }
+        </div>
       </div>
+      }
 
+      <!-- Lista de graduaciones -->
+      @if (cargandoGraduaciones) {
+      <span class="font-mono text-xs text-gray-400 animate-pulse">Cargando historial...</span>
+      } @else if (graduaciones.length === 0) {
+      <p class="font-mono text-xs text-gray-400 uppercase tracking-widest text-center py-6">SIN REGISTROS DE GRADUACIÓN
+      </p>
+      } @else {
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse min-w-[600px]">
+          <thead class="bg-gray-200 border-b-2 border-gray-950">
+            <tr class="text-[9px] font-black uppercase tracking-tight text-gray-500">
+              <th class="p-3 border-r border-gray-300">Fecha</th>
+              <th class="p-3 border-r border-gray-300 text-center" colspan="3">OD (Esf / Cil / Eje)</th>
+              <th class="p-3 border-r border-gray-300 text-center" colspan="3">OI (Esf / Cil / Eje)</th>
+              <th class="p-3 border-r border-gray-300">Obs.</th>
+              <th class="p-3"></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100 text-sm">
+            @for (g of graduaciones; track g.id) {
+            <tr class="hover:bg-gray-50">
+              <td class="p-3 font-mono font-bold border-r border-gray-100">{{g.fechaRevision}}</td>
+              <td class="p-3 font-mono text-center border-r border-gray-100" colspan="3">
+                <span [class.text-red-500]="g.odEsfera < 0">{{g.odEsfera > 0 ? '+' : ''}}{{g.odEsfera}}</span>
+                / {{g.odCilindro}} / {{g.odEje}}°
+              </td>
+              <td class="p-3 font-mono text-center border-r border-gray-100" colspan="3">
+                <span [class.text-red-500]="g.oiEsfera < 0">{{g.oiEsfera > 0 ? '+' : ''}}{{g.oiEsfera}}</span>
+                / {{g.oiCilindro}} / {{g.oiEje}}°
+              </td>
+              <td class="p-3 text-gray-500 border-r border-gray-100 text-[10px] max-w-[200px]">
+                {{g.observaciones || '—'}}</td>
+              <td class="p-3 text-right">
+                <button (click)="eliminarGraduacion(g)"
+                  class="text-[9px] font-black text-red-400 hover:text-red-600 uppercase font-mono cursor-pointer">ELIMINAR</button>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      }
     </div>
+    }
+
+    <!-- Vista: CITAS -->
+    @if (vistaFicha === 'citas' && !modoEdicion) {
+    <div class="p-6 grow flex flex-col gap-4">
+      <div class="flex items-center justify-between">
+        <span class="font-mono text-[10px] font-black text-gray-400 uppercase tracking-widest">HISTORIAL DE CITAS
+          ({{citasCliente.length}} registros)</span>
+        <button (click)="irACitas()"
+          class="font-mono text-[9px] font-black border-2 border-gray-950 px-3 py-1.5 hover:bg-gray-950 hover:text-white transition-all uppercase cursor-pointer">
+          VER CITAS ->
+        </button>
+      </div>
+      @if (cargandoCitas) {
+      <span class="font-mono text-xs text-gray-400 animate-pulse">Cargando citas...</span>
+      } @else if (citasCliente.length === 0) {
+      <p class="font-mono text-xs text-gray-400 uppercase tracking-widest text-center py-6">SIN CITAS REGISTRADAS</p>
+      } @else {
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-gray-200 border-b-2 border-gray-950">
+            <tr class="text-[9px] font-black uppercase tracking-tight text-gray-500">
+              <th class="p-3 border-r border-gray-300">Fecha</th>
+              <th class="p-3 border-r border-gray-300">Hora</th>
+              <th class="p-3 border-r border-gray-300">Motivo</th>
+              <th class="p-3">Estado</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100 text-sm">
+            @for (c of citasCliente; track c.id) {
+            <tr class="hover:bg-gray-50">
+              <td class="p-3 font-mono font-bold border-r border-gray-100">{{fechaCitaFicha(c)}}</td>
+              <td class="p-3 font-mono border-r border-gray-100">{{horaCitaFicha(c)}}</td>
+              <td class="p-3 border-r border-gray-100">{{c.motivo}}</td>
+              <td class="p-3">
+                <span class="px-2 py-0.5 text-[9px] font-black uppercase"
+                  [class]="estadoCitaClass(c.estado)">{{c.estado}}</span>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      }
+    </div>
+    }
+
+    <!-- Vista: VENTAS -->
+    @if (vistaFicha === 'ventas' && !modoEdicion) {
+    <div class="p-6 grow flex flex-col gap-4">
+      <span class="font-mono text-[10px] font-black text-gray-400 uppercase tracking-widest">HISTORIAL DE VENTAS
+        ({{ventasCliente.length}} registros)</span>
+      @if (cargandoVentas) {
+      <span class="font-mono text-xs text-gray-400 animate-pulse">Cargando ventas...</span>
+      } @else if (ventasCliente.length === 0) {
+      <p class="font-mono text-xs text-gray-400 uppercase tracking-widest text-center py-6">SIN VENTAS REGISTRADAS</p>
+      } @else {
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-gray-200 border-b-2 border-gray-950">
+            <tr class="text-[9px] font-black uppercase tracking-tight text-gray-500">
+              <th class="p-3 border-r border-gray-300">Fecha</th>
+              <th class="p-3 border-r border-gray-300">Producto</th>
+              <th class="p-3 border-r border-gray-300 text-right pr-4">Importe</th>
+              <th class="p-3 border-r border-gray-300">Método Pago</th>
+              <th class="p-3">Estado</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100 text-sm">
+            @for (v of ventasCliente; track v.id) {
+            <tr class="hover:bg-gray-50">
+              <td class="p-3 font-mono font-bold border-r border-gray-100">{{fechaVentaFicha(v)}}</td>
+              <td class="p-3 border-r border-gray-100">{{v.producto.modelo}}
+                <span class="text-gray-400 text-xs">/ {{v.producto.marca}}</span>
+              </td>
+              <td class="p-3 font-mono font-bold border-r border-gray-100 text-right pr-4">{{v.importe |
+                number:'1.2-2'}}€</td>
+              <td class="p-3 font-mono text-xs border-r border-gray-100 uppercase">{{v.metodoPago}}</td>
+              <td class="p-3">
+                @if (v.pagado) {
+                <span
+                  class="px-2 py-0.5 text-[9px] font-black uppercase bg-green-100 text-green-700 border border-green-300">PAGADO</span>
+                } @else {
+                <span
+                  class="px-2 py-0.5 text-[9px] font-black uppercase bg-orange-100 text-orange-700 border border-orange-300">PENDIENTE</span>
+                }
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      }
+    </div>
+    }
+
+    @if (errorModal) {
+    <div class="px-6 pb-2">
+      <span class="font-mono text-xs text-red-500 font-bold">ERROR: {{errorModal}}</span>
+    </div>
+    }
+
+    <!-- Footer de acciones -->
+    <div class="border-t-4 border-gray-950 p-4 flex gap-3 shrink-0">
+      @if (vistaFicha === 'datos' && !modoEdicion && esAdmin) {
+      <button (click)="iniciarEdicion()"
+        class="px-6 py-2 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all cursor-pointer">
+        EDITAR
+      </button>
+      <button (click)="eliminarCliente(clienteSeleccionado!)"
+        class="px-6 py-2 font-black text-xs uppercase border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white transition-all cursor-pointer">
+        ELIMINAR
+      </button>
+      }
+      @if (modoEdicion) {
+      <button (click)="guardarCambios()" [disabled]="guardando"
+        class="px-6 py-2 font-black text-xs uppercase bg-gray-950 text-white hover:bg-blue-600 transition-all cursor-pointer disabled:opacity-50">
+        {{guardando ? 'GUARDANDO...' : 'GUARDAR CAMBIOS'}}
+      </button>
+      <button (click)="cancelarEdicion()"
+        class="px-6 py-2 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all cursor-pointer">
+        CANCELAR
+      </button>
+      }
+    </div>
+
   </div>
+</div>
 }
 
 
 <!-- ======================== MODAL NUEVO CLIENTE ======================== -->
 @if (mostrarNuevo) {
-  <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-    <div class="bg-gray-100 border-4 border-gray-950 w-full max-w-2xl max-h-[90vh] overflow-y-auto flex flex-col">
+<div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+  <div class="bg-gray-100 border-4 border-gray-950 w-full max-w-2xl max-h-[90vh] overflow-y-auto flex flex-col">
 
-      <div class="flex items-center justify-between border-b-4 border-gray-950 p-6 pb-4 shrink-0">
-        <div>
-          <span class="font-mono text-[10px] text-blue-600 font-black tracking-widest block mb-1">ALTA_SISTEMA</span>
-          <h2 class="text-3xl font-black tracking-tighter uppercase">Nuevo Cliente</h2>
-        </div>
-        <button (click)="cerrarNuevo()" class="font-mono font-bold text-gray-400 hover:text-gray-950 text-sm tracking-widest cursor-pointer ml-4">[ X ]</button>
+    <div class="flex items-center justify-between border-b-4 border-gray-950 p-6 pb-4 shrink-0">
+      <div>
+        <span class="font-mono text-[10px] text-blue-600 font-black tracking-widest block mb-1">ALTA_SISTEMA</span>
+        <h2 class="text-3xl font-black tracking-tighter uppercase">Nuevo Cliente</h2>
       </div>
-
-      <div class="p-6 grid grid-cols-2 gap-x-8 gap-y-4 grow">
-        <div class="border-b-2 border-gray-950">
-          <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Nombre *</label>
-          <input [(ngModel)]="nuevoCliente.nombre" class="w-full bg-transparent outline-none py-1 text-sm font-bold" placeholder="Nombre">
-        </div>
-        <div class="border-b-2 border-gray-950">
-          <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Apellidos *</label>
-          <input [(ngModel)]="nuevoCliente.apellidos" class="w-full bg-transparent outline-none py-1 text-sm font-bold" placeholder="Apellidos">
-        </div>
-        <div class="border-b-2 border-gray-950">
-          <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">DNI *</label>
-          <input [(ngModel)]="nuevoCliente.dni" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold" placeholder="12345678A">
-        </div>
-        <div class="border-b-2 border-gray-950">
-          <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Teléfono</label>
-          <input [(ngModel)]="nuevoCliente.telefono" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold" placeholder="600000000">
-        </div>
-        <div class="border-b-2 border-gray-950">
-          <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Fecha Nacimiento</label>
-          <input [(ngModel)]="nuevoCliente.fechaNacimiento" type="date" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
-        </div>
-        <div class="border-b-2 border-gray-950">
-          <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Edad</label>
-          <input [(ngModel)]="nuevoCliente.edad" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold" placeholder="25">
-        </div>
-        <div class="col-span-2 border-b-2 border-gray-950">
-          <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Dirección</label>
-          <input [(ngModel)]="nuevoCliente.direccion" class="w-full bg-transparent outline-none py-1 text-sm font-bold" placeholder="Calle Ejemplo, 1">
-        </div>
-        <div class="border-b-2 border-gray-950">
-          <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Localidad</label>
-          <input [(ngModel)]="nuevoCliente.localidad" class="w-full bg-transparent outline-none py-1 text-sm font-bold" placeholder="Ciudad">
-        </div>
-        <div class="border-b-2 border-gray-950">
-          <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Provincia</label>
-          <input [(ngModel)]="nuevoCliente.provincia" class="w-full bg-transparent outline-none py-1 text-sm font-bold" placeholder="Provincia">
-        </div>
-        <div class="border-b-2 border-gray-950">
-          <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Código Postal</label>
-          <input [(ngModel)]="nuevoCliente.codigoPostal" class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold" placeholder="28001">
-        </div>
-      </div>
-
-      @if (errorNuevo) {
-        <div class="px-6 pb-2">
-          <span class="font-mono text-xs text-red-500 font-bold">ERROR: {{errorNuevo}}</span>
-        </div>
-      }
-
-      <div class="border-t-4 border-gray-950 p-4 flex gap-3 shrink-0">
-        <button (click)="crearCliente()" [disabled]="creando" class="px-6 py-2 font-black text-xs uppercase bg-gray-950 text-white hover:bg-blue-600 transition-all cursor-pointer disabled:opacity-50">
-          {{creando ? 'CREANDO...' : 'CREAR REGISTRO'}}
-        </button>
-        <button (click)="cerrarNuevo()" class="px-6 py-2 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all cursor-pointer">
-          CANCELAR
-        </button>
-      </div>
-
+      <button (click)="cerrarNuevo()"
+        class="font-mono font-bold text-gray-400 hover:text-gray-950 text-sm tracking-widest cursor-pointer ml-4">[ X
+        ]</button>
     </div>
+
+    <div class="p-6 grid grid-cols-2 gap-x-8 gap-y-4 grow">
+      <div class="border-b-2 border-gray-950">
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Nombre *</label>
+        <input [(ngModel)]="nuevoCliente.nombre" class="w-full bg-transparent outline-none py-1 text-sm font-bold"
+          placeholder="Nombre">
+      </div>
+      <div class="border-b-2 border-gray-950">
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Apellidos *</label>
+        <input [(ngModel)]="nuevoCliente.apellidos" class="w-full bg-transparent outline-none py-1 text-sm font-bold"
+          placeholder="Apellidos">
+      </div>
+      <div class="border-b-2 border-gray-950">
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">DNI *</label>
+        <input [(ngModel)]="nuevoCliente.dni"
+          class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold" placeholder="12345678A">
+      </div>
+      <div class="border-b-2 border-gray-950">
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Teléfono</label>
+        <input [(ngModel)]="nuevoCliente.telefono"
+          class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold" placeholder="600000000">
+      </div>
+      <div class="border-b-2 border-gray-950">
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Fecha Nacimiento</label>
+        <input [(ngModel)]="nuevoCliente.fechaNacimiento" type="date"
+          class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
+      </div>
+      <div class="border-b-2 border-gray-950">
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Edad</label>
+        <input [(ngModel)]="nuevoCliente.edad"
+          class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold" placeholder="25">
+      </div>
+      <div class="col-span-2 border-b-2 border-gray-950">
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Dirección</label>
+        <input [(ngModel)]="nuevoCliente.direccion" class="w-full bg-transparent outline-none py-1 text-sm font-bold"
+          placeholder="Calle Ejemplo, 1">
+      </div>
+      <div class="border-b-2 border-gray-950">
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Localidad</label>
+        <input [(ngModel)]="nuevoCliente.localidad" class="w-full bg-transparent outline-none py-1 text-sm font-bold"
+          placeholder="Ciudad">
+      </div>
+      <div class="border-b-2 border-gray-950">
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Provincia</label>
+        <input [(ngModel)]="nuevoCliente.provincia" class="w-full bg-transparent outline-none py-1 text-sm font-bold"
+          placeholder="Provincia">
+      </div>
+      <div class="border-b-2 border-gray-950">
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Código Postal</label>
+        <input [(ngModel)]="nuevoCliente.codigoPostal"
+          class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold" placeholder="28001">
+      </div>
+    </div>
+
+    @if (errorNuevo) {
+    <div class="px-6 pb-2">
+      <span class="font-mono text-xs text-red-500 font-bold">ERROR: {{errorNuevo}}</span>
+    </div>
+    }
+
+    <div class="border-t-4 border-gray-950 p-4 flex gap-3 shrink-0">
+      <button (click)="crearCliente()" [disabled]="creando"
+        class="px-6 py-2 font-black text-xs uppercase bg-gray-950 text-white hover:bg-blue-600 transition-all cursor-pointer disabled:opacity-50">
+        {{creando ? 'CREANDO...' : 'CREAR REGISTRO'}}
+      </button>
+      <button (click)="cerrarNuevo()"
+        class="px-6 py-2 font-black text-xs uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all cursor-pointer">
+        CANCELAR
+      </button>
+    </div>
+
   </div>
+</div>
 }

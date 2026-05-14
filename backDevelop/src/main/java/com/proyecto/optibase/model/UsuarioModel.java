@@ -1,5 +1,6 @@
 package com.proyecto.optibase.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -23,6 +24,8 @@ public class UsuarioModel {
     @NotBlank(message = "Introduzca su usuario")
     private String nombre;
 
+    // @JsonIgnore impide que el hash BCrypt viaje en las respuestas de la API
+    @JsonIgnore
     @NotBlank(message = "Introduzca su contraseña")
     private String contrasenya;
 

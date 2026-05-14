@@ -33,6 +33,7 @@ public class ProductoModel {
 
     private boolean esRecambio = false;
 
+    // LAZY para no cargar el padre en cada consulta de lista; @JsonIgnoreProperties evita el error de serialización de proxies Hibernate
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "producto_padre_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})

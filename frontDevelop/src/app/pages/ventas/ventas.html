@@ -1,0 +1,230 @@
+<div
+  class="h-screen w-screen bg-gray-100 text-gray-950 p-6 flex flex-col overflow-hidden font-sans border-[3px] border-gray-950 box-border">
+
+  <header class="shrink-0 flex items-center justify-between border-b-2 border-gray-950 pb-3 mb-5">
+    <div class="flex items-center gap-6">
+      <button (click)="volverAlMenu()"
+        class="font-mono text-xs font-bold text-gray-400 hover:text-gray-950 border-b-2 border-transparent hover:border-gray-950 transition-colors uppercase tracking-widest cursor-pointer">
+        &lt; MENU
+      </button>
+      <div>
+        <h1 class="text-5xl font-black tracking-tighter uppercase italic text-gray-950">Ventas<span
+            class="text-gray-400">_</span></h1>
+        <p class="text-[9px] font-mono font-bold text-gray-400 tracking-widest leading-none mt-1 uppercase">REGISTRO DE
+          VENTAS // TOTAL: {{totalVentas}}</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-8 text-right">
+      @if (esAdmin) {
+      <button (click)="abrirNueva()"
+        class="font-mono text-[10px] font-black border-2 border-gray-950 px-4 py-2 hover:bg-gray-950 hover:text-white transition-all uppercase tracking-widest cursor-pointer">
+        + NUEVA VENTA
+      </button>
+      }
+      <div>
+        <span class="block text-[9px] font-mono font-black text-gray-400 uppercase tracking-widest">Pendientes</span>
+        <span class="text-2xl font-black text-orange-500">{{ventasPendientesCount}}</span>
+      </div>
+      <div>
+        <span class="block text-[9px] font-mono font-black text-gray-400 uppercase tracking-widest">Importe Total</span>
+        <span class="text-2xl font-black text-gray-950">{{importeTotal | number:'1.2-2'}}€</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="shrink-0 grid grid-cols-1 md:grid-cols-3 gap-8 mb-6 px-2">
+    <div class="border-l-4 border-gray-950 pl-4">
+      <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Filtro Cliente</label>
+      <input [(ngModel)]="filtroCliente" (input)="currentPage=1; aplicarFiltros()" type="text"
+        placeholder="Nombre o apellidos..."
+        class="w-full bg-transparent outline-none py-1 text-sm font-bold">
+    </div>
+    <div class="border-l-4 border-gray-950 pl-4">
+      <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Filtro Fecha</label>
+      <input [(ngModel)]="filtroFecha" (input)="currentPage=1; aplicarFiltros()" type="date"
+        class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
+    </div>
+    <div class="border-l-4 border-gray-950 pl-4">
+      <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Estado Pago</label>
+      <select [(ngModel)]="filtroPagado" (change)="currentPage=1; aplicarFiltros()"
+        class="w-full bg-transparent outline-none py-1 text-sm font-bold cursor-pointer">
+        <option value="">Todos</option>
+        <option value="false">Pendiente</option>
+        <option value="true">Pagado</option>
+      </select>
+    </div>
+  </section>
+
+  @if (cargando) {
+  <div class="grow flex items-center justify-center">
+    <span class="font-mono font-bold text-gray-400 tracking-widest animate-pulse">Cargando ventas...</span>
+  </div>
+  }
+
+  @if (errorCarga && !cargando) {
+  <div class="grow flex flex-col items-center justify-center gap-4">
+    <span class="font-mono font-bold text-red-500 text-sm text-center">{{errorCarga}}</span>
+    <button (click)="cargarVentas()"
+      class="font-mono text-xs font-bold border-2 border-gray-950 px-4 py-2 hover:bg-gray-950 hover:text-white transition-all uppercase cursor-pointer">
+      REINTENTAR
+    </button>
+  </div>
+  }
+
+  @if (!cargando && !errorCarga) {
+  <div class="grow overflow-auto border-2 border-gray-950 bg-white">
+    <table class="w-full text-left border-collapse table-fixed min-w-[1000px]">
+      <thead class="sticky top-0 bg-gray-200 border-b-2 border-gray-950 z-10">
+        <tr class="text-[10px] text-gray-900 uppercase font-black tracking-tight">
+          <th class="p-2 w-14 border-r border-gray-300 text-center text-gray-400">ID</th>
+          <th (click)="sortBy('fechaVenta')" class="p-2 w-36 border-r border-gray-300 cursor-pointer select-none hover:bg-gray-300" [class.text-blue-600]="sortColumn==='fechaVenta'">Fecha {{sortIcon('fechaVenta')}}</th>
+          <th class="p-2 w-56 border-r border-gray-300">Cliente</th>
+          <th class="p-2 w-48 border-r border-gray-300">Producto</th>
+          <th (click)="sortBy('importe')" class="p-2 w-28 border-r border-gray-300 text-right pr-4 cursor-pointer select-none hover:bg-gray-300" [class.text-blue-600]="sortColumn==='importe'">Importe {{sortIcon('importe')}}</th>
+          <th (click)="sortBy('metodoPago')" class="p-2 w-32 border-r border-gray-300 cursor-pointer select-none hover:bg-gray-300" [class.text-blue-600]="sortColumn==='metodoPago'">Método Pago {{sortIcon('metodoPago')}}</th>
+          <th (click)="sortBy('pagado')" class="p-2 w-28 border-r border-gray-300 text-center cursor-pointer select-none hover:bg-gray-300" [class.text-blue-600]="sortColumn==='pagado'">Estado {{sortIcon('pagado')}}</th>
+          @if (esAdmin) {
+          <th class="p-2 w-24 text-right pr-4">Acción</th>
+          }
+        </tr>
+      </thead>
+      <tbody class="text-sm divide-y divide-gray-100">
+        @for (v of ventasPaginadas; track v.id) {
+        <tr class="hover:bg-gray-50 transition-colors">
+          <td class="p-2 font-mono text-xs text-gray-400 border-r border-gray-50 text-center">#{{v.id}}</td>
+          <td class="p-2 font-mono border-r border-gray-50">
+            <span class="font-bold">{{fechaVenta(v)}}</span>
+            <span class="text-gray-400 text-xs ml-1">{{horaVenta(v)}}</span>
+          </td>
+          <td class="p-2 font-bold text-gray-950 border-r border-gray-50">{{v.cliente.nombre}} {{v.cliente.apellidos}}</td>
+          <td class="p-2 border-r border-gray-50 text-gray-700">{{v.producto.modelo}}
+            <span class="text-gray-400 text-xs">/ {{v.producto.marca}}</span>
+          </td>
+          <td class="p-2 font-mono font-bold border-r border-gray-50 text-right pr-4">{{v.importe | number:'1.2-2'}}€</td>
+          <td class="p-2 font-mono text-xs border-r border-gray-50 uppercase tracking-wide">{{v.metodoPago}}</td>
+          <td class="p-2 border-r border-gray-50 text-center">
+            @if (v.pagado) {
+            <span class="px-2 py-0.5 text-[9px] font-black uppercase bg-green-100 text-green-700 border border-green-300">PAGADO</span>
+            } @else {
+            <span class="px-2 py-0.5 text-[9px] font-black uppercase bg-orange-100 text-orange-700 border border-orange-300">PENDIENTE</span>
+            }
+          </td>
+          @if (esAdmin) {
+          <td class="p-2 text-right pr-4">
+            <button (click)="eliminarVenta(v)"
+              class="text-[9px] font-black text-red-400 hover:text-red-600 uppercase font-mono cursor-pointer">ELIMINAR</button>
+          </td>
+          }
+        </tr>
+        } @empty {
+        <tr>
+          <td colspan="8" class="p-8 text-center font-mono text-gray-400 text-xs">SIN RESULTADOS</td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <footer class="shrink-0 flex items-center justify-between pt-4 font-mono">
+    <div class="flex items-center gap-8 text-[9px] font-black text-gray-300 uppercase">
+      <span>Results: {{ventasFiltradas.length}}</span>
+    </div>
+    <div class="flex items-center border-2 border-gray-950 bg-white">
+      <button (click)="prevPage()" [disabled]="currentPage === 1"
+        class="px-4 py-1.5 text-[10px] font-black hover:bg-gray-950 hover:text-white disabled:opacity-20 border-r-2 border-gray-950 transition-all uppercase cursor-pointer">
+        &lt;&lt; Prev
+      </button>
+      <div class="px-6 py-1.5 text-[10px] font-black bg-gray-100 flex items-center gap-3">
+        <span class="text-gray-400 font-bold">PÁG.</span>
+        <span class="text-sm font-black">{{currentPage}}</span>
+        <span class="text-gray-400">/</span>
+        <span class="font-bold">{{totalPages}}</span>
+      </div>
+      <button (click)="nextPage()" [disabled]="currentPage === totalPages"
+        class="px-4 py-1.5 text-[10px] font-black hover:bg-gray-950 hover:text-white disabled:opacity-20 border-l-2 border-gray-950 transition-all uppercase cursor-pointer">
+        Next &gt;&gt;
+      </button>
+    </div>
+  </footer>
+  }
+</div>
+
+<!-- Modal de creación de venta: solo visible para ROLE_ADMIN (el botón que lo abre ya está guardado con @if esAdmin) -->
+@if (mostrarNueva) {
+<div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+  <div class="bg-white border-4 border-gray-950 w-full max-w-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+
+    <div class="flex items-center justify-between border-b-2 border-gray-950 px-6 py-4">
+      <h2 class="text-xl font-black uppercase tracking-tighter">Nueva Venta</h2>
+      <button (click)="cerrarNueva()" class="font-mono text-xs font-bold text-gray-400 hover:text-gray-950 uppercase cursor-pointer">✕ CERRAR</button>
+    </div>
+
+    <div class="px-6 py-5 flex flex-col gap-4">
+
+      @if (errorNueva) {
+      <div class="border-2 border-red-500 bg-red-50 px-4 py-2">
+        <span class="font-mono text-xs font-bold text-red-600">{{errorNueva}}</span>
+      </div>
+      }
+
+      <div class="border-l-4 border-gray-950 pl-4">
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Cliente *</label>
+        <select [(ngModel)]="nuevaVenta.clienteId"
+          class="w-full bg-transparent outline-none py-1 text-sm font-bold border-b border-gray-300">
+          <option [ngValue]="null" disabled>Selecciona un cliente...</option>
+          @for (c of clientesLista; track c.id) {
+          <option [value]="c.id">{{c.nombre}} {{c.apellidos}} — {{c.dni}}</option>
+          }
+        </select>
+      </div>
+
+      <div class="border-l-4 border-gray-950 pl-4">
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Producto *</label>
+        <select [(ngModel)]="nuevaVenta.productoId"
+          class="w-full bg-transparent outline-none py-1 text-sm font-bold border-b border-gray-300">
+          <option [ngValue]="null" disabled>Selecciona un producto...</option>
+          @for (a of articulosLista; track a.id) {
+          <option [value]="a.id">{{a.marca}} {{a.modelo}} — Stock: {{a.stock}}</option>
+          }
+        </select>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div class="border-l-4 border-gray-950 pl-4">
+          <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Importe (€) *</label>
+          <input [(ngModel)]="nuevaVenta.importe" type="number" min="0.01" step="0.01"
+            class="w-full bg-transparent outline-none py-1 text-sm font-bold border-b border-gray-300">
+        </div>
+        <div class="border-l-4 border-gray-950 pl-4">
+          <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Método Pago *</label>
+          <select [(ngModel)]="nuevaVenta.metodoPago"
+            class="w-full bg-transparent outline-none py-1 text-sm font-bold border-b border-gray-300">
+            @for (m of metodosPago; track m) {
+            <option [value]="m">{{m}}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="border-l-4 border-gray-950 pl-4 flex items-center gap-3">
+        <input [(ngModel)]="nuevaVenta.pagado" type="checkbox" id="pagado"
+          class="w-4 h-4 border-2 border-gray-950 cursor-pointer">
+        <label for="pagado" class="text-[9px] font-black text-gray-400 uppercase tracking-widest cursor-pointer">Pagado en el momento</label>
+      </div>
+
+    </div>
+
+    <div class="flex justify-end gap-3 border-t-2 border-gray-950 px-6 py-4">
+      <button (click)="cerrarNueva()" [disabled]="creando"
+        class="font-mono text-xs font-bold border-2 border-gray-400 px-4 py-2 text-gray-400 hover:border-gray-950 hover:text-gray-950 transition-all uppercase cursor-pointer disabled:opacity-40">
+        CANCELAR
+      </button>
+      <button (click)="crearVenta()" [disabled]="creando"
+        class="font-mono text-xs font-bold border-2 border-gray-950 bg-gray-950 text-white px-6 py-2 hover:bg-white hover:text-gray-950 transition-all uppercase cursor-pointer disabled:opacity-40">
+        {{creando ? 'REGISTRANDO...' : 'REGISTRAR VENTA'}}
+      </button>
+    </div>
+
+  </div>
+</div>
+}

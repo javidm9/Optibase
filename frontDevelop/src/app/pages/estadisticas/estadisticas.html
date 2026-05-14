@@ -1,0 +1,190 @@
+<div
+  class="h-screen w-screen bg-gray-100 text-gray-950 p-6 flex flex-col font-sans border-[3px] border-gray-950 box-border overflow-hidden">
+
+  <!-- Header -->
+  <header class="shrink-0 flex items-center justify-between border-b-2 border-gray-950 pb-3 mb-6">
+    <div class="flex items-center gap-6">
+      <button (click)="volverAlMenu()"
+        class="font-mono text-xs font-bold text-gray-400 hover:text-gray-950 border-b-2 border-transparent hover:border-gray-950 transition-colors uppercase tracking-widest cursor-pointer">
+        &lt; MENU
+      </button>
+      <div>
+        <h1 class="text-5xl font-black tracking-tighter uppercase italic text-gray-950">Dashboard<span
+            class="text-gray-400">_</span></h1>
+        <p class="text-[9px] font-mono font-bold text-gray-400 tracking-widest leading-none mt-1 uppercase">MÉTRICAS
+          DEL SISTEMA // {{totalClientes}} CLIENTES REGISTRADOS</p>
+      </div>
+    </div>
+    <button (click)="cargarDatos()"
+      class="font-mono text-[10px] font-black border-2 border-gray-950 px-4 py-2 hover:bg-gray-950 hover:text-white transition-all uppercase tracking-widest cursor-pointer">
+      ↻ ACTUALIZAR
+    </button>
+  </header>
+
+  @if (cargando) {
+  <div class="grow flex items-center justify-center">
+    <span class="font-mono font-bold text-gray-400 tracking-widest animate-pulse text-sm">Cargando métricas...</span>
+  </div>
+  }
+
+  @if (errorCarga && !cargando) {
+  <div class="grow flex flex-col items-center justify-center gap-4">
+    <span class="font-mono font-bold text-red-500 text-sm text-center">{{errorCarga}}</span>
+    <button (click)="cargarDatos()"
+      class="font-mono text-xs font-bold border-2 border-gray-950 px-4 py-2 hover:bg-gray-950 hover:text-white transition-all uppercase cursor-pointer">
+      REINTENTAR
+    </button>
+  </div>
+  }
+
+  @if (!cargando && !errorCarga) {
+  <div class="grow overflow-auto flex flex-col gap-6 pr-1">
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- BLOQUE 1 — Resumen del día                                 -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <section>
+      <p class="font-mono text-[9px] font-black text-gray-400 uppercase tracking-widest mb-3">// RESUMEN DEL DÍA</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+        <button (click)="irACitas()" class="border-4 border-gray-950 bg-white p-6 flex flex-col text-left shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-gray-950 hover:text-white transition-colors duration-150 cursor-pointer group">
+          <span class="font-mono text-[9px] font-black text-blue-600 uppercase tracking-widest mb-2 group-hover:text-blue-400">CITAS HOY</span>
+          <span class="text-7xl font-black text-gray-950 leading-none group-hover:text-white">{{citasHoy}}</span>
+          <span class="font-mono text-[9px] text-gray-400 uppercase tracking-widest mt-3 group-hover:text-gray-500">pendientes de atención</span>
+        </button>
+
+        <button (click)="irAVentas()" class="border-4 border-gray-950 bg-white p-6 flex flex-col text-left shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-gray-950 hover:text-white transition-colors duration-150 cursor-pointer group">
+          <span class="font-mono text-[9px] font-black text-blue-600 uppercase tracking-widest mb-2 group-hover:text-blue-400">VENTAS HOY</span>
+          <span class="text-7xl font-black text-gray-950 leading-none group-hover:text-white">{{ventasHoy}}</span>
+          <span class="font-mono text-[9px] text-gray-400 uppercase tracking-widest mt-3 group-hover:text-gray-500">tickets realizados</span>
+        </button>
+
+        <button (click)="irAEncargos()" class="border-4 border-gray-950 bg-white p-6 flex flex-col text-left shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-gray-950 hover:text-white transition-colors duration-150 cursor-pointer group">
+          <span class="font-mono text-[9px] font-black text-blue-600 uppercase tracking-widest mb-2 group-hover:text-blue-400">ENCARGOS PENDIENTES</span>
+          <span class="text-7xl font-black text-gray-950 leading-none group-hover:text-white">{{encargosPendientes}}</span>
+          <span class="font-mono text-[9px] text-gray-400 uppercase tracking-widest mt-3 group-hover:text-gray-500">por entregar</span>
+        </button>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- BLOQUE 2 — Métricas del mes                                -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <section>
+      <p class="font-mono text-[9px] font-black text-gray-400 uppercase tracking-widest mb-3">// MÉTRICAS DEL MES</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+        <button (click)="irAVentas()" class="border-2 border-gray-950 bg-gray-950 text-white p-6 flex flex-col text-left hover:bg-gray-800 transition-colors duration-150 cursor-pointer group">
+          <span class="font-mono text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 group-hover:text-gray-300">FACTURACIÓN MES</span>
+          <span class="text-4xl font-black leading-none">{{totalVentasMes | number:'1.2-2'}}€</span>
+          <span class="font-mono text-[9px] text-gray-500 uppercase tracking-widest mt-3">suma de importes</span>
+        </button>
+
+        <button (click)="irACitas()" class="border-2 border-gray-950 bg-white p-6 flex flex-col text-left hover:bg-gray-950 hover:text-white transition-colors duration-150 cursor-pointer group">
+          <span class="font-mono text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 group-hover:text-gray-500">CITAS PENDIENTES</span>
+          <span class="text-4xl font-black text-gray-950 leading-none group-hover:text-white">{{citasPendientes}}</span>
+          <span class="font-mono text-[9px] text-gray-400 uppercase tracking-widest mt-3 group-hover:text-gray-500">total sin completar</span>
+        </button>
+
+        <button (click)="irAInventario()" class="border-2 border-gray-950 p-6 flex flex-col text-left hover:bg-gray-950 hover:text-white transition-colors duration-150 cursor-pointer group"
+          [class.bg-red-50]="productosAgotados > 0" [class.bg-white]="productosAgotados === 0">
+          <span class="font-mono text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 group-hover:text-gray-500">AGOTADOS</span>
+          <span class="text-4xl font-black leading-none group-hover:text-white"
+            [class.text-red-600]="productosAgotados > 0"
+            [class.text-gray-950]="productosAgotados === 0">{{productosAgotados}}</span>
+          <span class="font-mono text-[9px] text-gray-400 uppercase tracking-widest mt-3 group-hover:text-gray-500">productos sin stock</span>
+        </button>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- BLOQUE 3 — Actividad reciente                              -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <section>
+      <p class="font-mono text-[9px] font-black text-gray-400 uppercase tracking-widest mb-3">// ACTIVIDAD RECIENTE</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        <!-- Últimas 5 ventas -->
+        <div class="border-2 border-gray-950 bg-white flex flex-col">
+          <button (click)="irAVentas()" class="border-b-2 border-gray-950 px-4 py-3 text-left hover:bg-gray-950 hover:text-white transition-colors duration-150 cursor-pointer group flex items-center justify-between">
+            <span class="font-mono text-[9px] font-black uppercase tracking-widest">ÚLTIMAS VENTAS</span>
+            <span class="font-mono text-[9px] text-gray-400 group-hover:text-gray-300">VER TODAS -></span>
+          </button>
+          @if (ultimasVentas.length === 0) {
+          <div class="p-6 text-center">
+            <span class="font-mono text-xs text-gray-400 uppercase">Sin ventas registradas</span>
+          </div>
+          } @else {
+          <table class="w-full text-left border-collapse">
+            <thead class="bg-gray-50 border-b border-gray-200">
+              <tr class="text-[9px] font-black uppercase tracking-tight text-gray-400">
+                <th class="px-4 py-2 border-r border-gray-100">Fecha</th>
+                <th class="px-4 py-2 border-r border-gray-100">Cliente</th>
+                <th class="px-4 py-2 border-r border-gray-100 text-right">Importe</th>
+                <th class="px-4 py-2">Método</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 text-sm">
+              @for (v of ultimasVentas; track v.id) {
+              <tr class="hover:bg-gray-50">
+                <td class="px-4 py-2.5 font-mono text-xs border-r border-gray-100">{{fechaCorta(v.fechaVenta)}}</td>
+                <td class="px-4 py-2.5 font-bold text-xs border-r border-gray-100 truncate max-w-[120px]">
+                  {{v.cliente.nombre}} {{v.cliente.apellidos}}</td>
+                <td class="px-4 py-2.5 font-mono font-bold border-r border-gray-100 text-right text-green-700">
+                  {{v.importe | number:'1.2-2'}}€</td>
+                <td class="px-4 py-2.5 font-mono text-xs uppercase text-gray-400">{{v.metodoPago}}</td>
+              </tr>
+              }
+            </tbody>
+          </table>
+          }
+        </div>
+
+        <!-- Próximas 5 citas -->
+        <div class="border-2 border-gray-950 bg-white flex flex-col">
+          <button (click)="irACitas()" class="border-b-2 border-gray-950 px-4 py-3 text-left hover:bg-gray-950 hover:text-white transition-colors duration-150 cursor-pointer group flex items-center justify-between">
+            <span class="font-mono text-[9px] font-black uppercase tracking-widest">PRÓXIMAS CITAS</span>
+            <span class="font-mono text-[9px] text-gray-400 group-hover:text-gray-300">VER TODAS -></span>
+          </button>
+          @if (proximasCitas.length === 0) {
+          <div class="p-6 text-center">
+            <span class="font-mono text-xs text-gray-400 uppercase">Sin citas próximas</span>
+          </div>
+          } @else {
+          <table class="w-full text-left border-collapse">
+            <thead class="bg-gray-50 border-b border-gray-200">
+              <tr class="text-[9px] font-black uppercase tracking-tight text-gray-400">
+                <th class="px-4 py-2 border-r border-gray-100">Fecha</th>
+                <th class="px-4 py-2 border-r border-gray-100">Hora</th>
+                <th class="px-4 py-2 border-r border-gray-100">Motivo</th>
+                <th class="px-4 py-2">Estado</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 text-sm">
+              @for (c of proximasCitas; track c.id) {
+              <tr class="hover:bg-gray-50">
+                <td class="px-4 py-2.5 font-mono font-bold text-xs border-r border-gray-100">{{fechaCorta(c.fechaHora)}}</td>
+                <td class="px-4 py-2.5 font-mono text-xs border-r border-gray-100">{{horaCorta(c.fechaHora)}}</td>
+                <td class="px-4 py-2.5 text-xs border-r border-gray-100 truncate max-w-[120px]">{{c.motivo}}</td>
+                <td class="px-4 py-2.5">
+                  <span class="px-2 py-0.5 text-[8px] font-black uppercase"
+                    [class]="estadoCitaClass(c.estado)">{{c.estado}}</span>
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+          }
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Spacer inferior -->
+    <div class="shrink-0 h-2"></div>
+
+  </div>
+  }
+</div>

@@ -18,8 +18,13 @@ public class VentaService {
     @Autowired
     private ProductoRepository productoRepository;
 
+    // @Transactional garantiza que si el save de la venta falla, el decremento de stock se deshace también
     @Transactional
     public VentaModel guardarVenta(VentaModel venta) {
+        // El cliente puede mandar un objeto producto sin ID si no seleccionó ninguno; lo valido aquí antes del findById
+        if (venta.getProducto() == null || venta.getProducto().getId() == null) {
+            throw new IllegalArgumentException("El producto es obligatorio y debe tener un ID válido");
+        }
         ProductoModel producto = productoRepository.findById(venta.getProducto().getId())
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
@@ -31,6 +36,10 @@ public class VentaService {
         productoRepository.save(producto);
 
         return ventaRepository.save(venta);
+    }
+
+    public List<VentaModel> obtenerTodas() {
+        return ventaRepository.findAll();
     }
 
     public List<VentaModel> obtenerVentasPorCliente(Long clienteId) {

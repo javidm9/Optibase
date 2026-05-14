@@ -1,4 +1,4 @@
-export type CategoriaProducto = 'MONTURA' | 'GAFA_SOL' | 'LIQUIDO';
+export type CategoriaProducto = 'MONTURA' | 'GAFA_SOL' | 'LIQUIDO' | 'LENTE';
 
 export interface Articulo {
   id?: number;

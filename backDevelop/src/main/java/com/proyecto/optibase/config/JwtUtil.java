@@ -12,9 +12,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Date;
 
+// Utilidad para generar y validar tokens JWT (JJWT 0.12.x)
 @Component
 public class JwtUtil {
 
+    // El secreto viene en Base64 desde la variable de entorno JWT_SECRET para no exponerlo en código
     @Value("${jwt.secret}")
     private String secret;
 
@@ -26,6 +28,7 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
+    // Incluyo el rol como claim para que el frontend pueda saber los permisos sin llamar al backend
     public String generateToken(UsuarioModel usuario) {
         return Jwts.builder()
                 .subject(usuario.getNombre())
@@ -45,6 +48,7 @@ public class JwtUtil {
                 .getPayload();
     }
 
+    // Devuelve false si el token está expirado o la firma no es válida
     public boolean isTokenValid(String token) {
         try {
             extractClaims(token);

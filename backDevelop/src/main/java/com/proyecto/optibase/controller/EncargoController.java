@@ -14,6 +14,11 @@ public class EncargoController {
     @Autowired
     private EncargoService encargoService;
 
+    @GetMapping
+    public List<EncargoModel> obtenerTodos() {
+        return encargoService.obtenerTodos();
+    }
+
     @GetMapping("/tipo/{tipo}")
     public List<EncargoModel> obtenerPorTipo(@PathVariable String tipo) {
         return encargoService.obtenerPorTipo(tipo);

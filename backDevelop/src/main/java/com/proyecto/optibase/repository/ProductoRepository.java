@@ -7,6 +7,7 @@ import java.util.List;
 
 @Repository
 public interface ProductoRepository extends JpaRepository<ProductoModel, Long> {
+    // Separo el listado principal de los recambios para no mezclarlos en la tabla de inventario
     List<ProductoModel> findByEsRecambioFalse();
     List<ProductoModel> findByProductoPadreId(Long padreId);
 }

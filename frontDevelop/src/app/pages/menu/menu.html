@@ -54,12 +54,44 @@
         </div>
       </button>
 
+      <button (click)="irAVentas()" class="group text-left border-4 border-gray-950 p-6 md:p-8 flex flex-col justify-between min-h-[220px] hover:bg-gray-950 transition-colors duration-150 rounded-none shadow-none cursor-pointer">
+        <div>
+          <span class="font-mono text-xs font-bold text-blue-600 block mb-2 tracking-widest">MOD_04</span>
+          <h2 class="text-4xl font-black tracking-tighter text-gray-950 group-hover:text-white uppercase leading-none">Ventas</h2>
+        </div>
+        <div class="flex justify-between items-end mt-8">
+          <span class="font-mono text-[10px] text-gray-500 group-hover:text-gray-400 uppercase tracking-widest">Ticket de Venta<br>Pagos y Cobros</span>
+          <span class="text-4xl text-gray-950 group-hover:text-white font-black group-hover:translate-x-2 transition-transform duration-200 leading-none">-></span>
+        </div>
+      </button>
+
+      <button (click)="irAEncargos()" class="group text-left border-4 border-gray-950 p-6 md:p-8 flex flex-col justify-between min-h-[220px] hover:bg-gray-950 transition-colors duration-150 rounded-none shadow-none cursor-pointer">
+        <div>
+          <span class="font-mono text-xs font-bold text-blue-600 block mb-2 tracking-widest">MOD_05</span>
+          <h2 class="text-4xl font-black tracking-tighter text-gray-950 group-hover:text-white uppercase leading-none">Encargos</h2>
+        </div>
+        <div class="flex justify-between items-end mt-8">
+          <span class="font-mono text-[10px] text-gray-500 group-hover:text-gray-400 uppercase tracking-widest">Pedidos Fábrica<br>Estado y Entrega</span>
+          <span class="text-4xl text-gray-950 group-hover:text-white font-black group-hover:translate-x-2 transition-transform duration-200 leading-none">-></span>
+        </div>
+      </button>
+
+      <button (click)="irAEstadisticas()" class="group text-left border-4 border-gray-950 p-6 md:p-8 flex flex-col justify-between min-h-[220px] hover:bg-gray-950 transition-colors duration-150 rounded-none shadow-none cursor-pointer">
+        <div>
+          <span class="font-mono text-xs font-bold text-blue-600 block mb-2 tracking-widest">MOD_06</span>
+          <h2 class="text-4xl font-black tracking-tighter text-gray-950 group-hover:text-white uppercase leading-none">Dashboard</h2>
+        </div>
+        <div class="flex justify-between items-end mt-8">
+          <span class="font-mono text-[10px] text-gray-500 group-hover:text-gray-400 uppercase tracking-widest">Métricas / Resumen<br>Actividad Reciente</span>
+          <span class="text-4xl text-gray-950 group-hover:text-white font-black group-hover:translate-x-2 transition-transform duration-200 leading-none">-></span>
+        </div>
+      </button>
+
     </div>
   </main>
 
   <footer class="shrink-0 border-t-2 border-gray-300 pt-4 flex items-end justify-between text-[10px] md:text-xs font-mono text-gray-400">
-    <span>SISTEMA EN LÍNEA // ENTORNO PROD</span>
-    <span class="font-bold text-gray-900 hidden sm:inline">OPTIBASE ERP CORE</span>
+    <span class="font-bold text-gray-900 hidden sm:inline">OPTIBASE</span>
   </footer>
 
 </div>

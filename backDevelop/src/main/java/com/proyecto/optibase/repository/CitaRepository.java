@@ -11,7 +11,7 @@ import java.util.List;
 public interface CitaRepository extends JpaRepository<CitaModel, Long> {
     List<CitaModel> findByClienteId(Long clienteId);
 
+    // Estos dos métodos los usa CitaService para detectar conflictos de horario antes de guardar una cita
     boolean existsByFechaHora(LocalDateTime fechaHora);
-
     boolean existsByFechaHoraAndIdNot(LocalDateTime fechaHora, Long id);
 }

@@ -4,8 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Cliente } from '../../models/cliente';
 import { Graduacion } from '../../models/graduacion';
+import { Cita, EstadoCita } from '../../models/cita';
+import { Venta } from '../../models/venta';
 import { ClienteService } from '../../services/cliente.service';
 import { GraduacionService } from '../../services/graduacion.service';
+import { CitaService } from '../../services/cita.service';
+import { VentaService } from '../../services/venta.service';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -15,7 +19,6 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './clientes.html',
 })
 export class ClientesList implements OnInit {
-
   clientesOriginales: Cliente[] = [];
   filteredClientes: Cliente[] = [];
   paginatedClientes: Cliente[] = [];
@@ -24,6 +27,9 @@ export class ClientesList implements OnInit {
   currentPage = 1;
   itemsPerPage = 20;
   totalPages = 1;
+
+  sortColumn = '';
+  sortDirection: 'asc' | 'desc' = 'asc';
 
   cargando = false;
   errorCarga: string | null = null;
@@ -39,22 +45,29 @@ export class ClientesList implements OnInit {
   creando = false;
   errorNuevo: string | null = null;
 
-  vistaFicha: 'datos' | 'graduaciones' = 'datos';
+  vistaFicha: 'datos' | 'graduaciones' | 'citas' | 'ventas' = 'datos';
   graduaciones: Graduacion[] = [];
   cargandoGraduaciones = false;
   mostrarFormGraduacion = false;
-  nuevaGraduacion: Partial<Graduacion> = {};
+  nuevaGraduacion: Graduacion = {} as Graduacion;
   creandoGraduacion = false;
   errorGraduacion: string | null = null;
+
+  citasCliente: Cita[] = [];
+  cargandoCitas = false;
+  ventasCliente: Venta[] = [];
+  cargandoVentas = false;
 
   esAdmin = false;
 
   constructor(
     private clienteService: ClienteService,
     private graduacionService: GraduacionService,
+    private citaService: CitaService,
+    private ventaService: VentaService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private authService: AuthService
+    private authService: AuthService,
   ) {
     this.esAdmin = this.authService.getRol() === 'ROLE_ADMIN';
   }
@@ -74,36 +87,74 @@ export class ClientesList implements OnInit {
         this.cdr.detectChanges();
       },
       error: () => {
-        this.errorCarga = 'No se pudo conectar con el servidor. Verifica que el backend esté activo en localhost:8080.';
+        this.errorCarga = 'No se pudo conectar con el servidor. Verifica la conexión.';
         this.cargando = false;
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
   applyFilters() {
-    const searchData = this.clientesOriginales.filter(p =>
-      (p.nombre ?? '').toLowerCase().includes(this.filtros.nombre.toLowerCase()) &&
-      (p.apellidos ?? '').toLowerCase().includes(this.filtros.apellidos.toLowerCase()) &&
-      (p.dni ?? '').toLowerCase().includes(this.filtros.dni.toLowerCase())
+    const filtered = this.clientesOriginales.filter(
+      (p) =>
+        (p.nombre ?? '').toLowerCase().includes(this.filtros.nombre.toLowerCase()) &&
+        (p.apellidos ?? '').toLowerCase().includes(this.filtros.apellidos.toLowerCase()) &&
+        (p.dni ?? '').toLowerCase().includes(this.filtros.dni.toLowerCase()),
     );
-    this.totalPages = Math.ceil(searchData.length / this.itemsPerPage) || 1;
+    const sorted = this.applySorting(filtered);
+    this.totalPages = Math.ceil(sorted.length / this.itemsPerPage) || 1;
     if (this.currentPage > this.totalPages) this.currentPage = 1;
     const start = (this.currentPage - 1) * this.itemsPerPage;
-    this.paginatedClientes = searchData.slice(start, start + this.itemsPerPage);
-    this.filteredClientes = searchData;
+    this.paginatedClientes = sorted.slice(start, start + this.itemsPerPage);
+    this.filteredClientes = sorted;
+  }
+
+  sortBy(column: string) {
+    this.sortDirection = this.sortColumn === column && this.sortDirection === 'asc' ? 'desc' : 'asc';
+    this.sortColumn = column;
+    this.currentPage = 1;
+    this.applyFilters();
+  }
+
+  sortIcon(col: string): string {
+    if (this.sortColumn !== col) return '⇅';
+    return this.sortDirection === 'asc' ? '↑' : '↓';
+  }
+
+  private applySorting(data: Cliente[]): Cliente[] {
+    if (!this.sortColumn) return data;
+    return [...data].sort((a, b) => {
+      let cmp = 0;
+      switch (this.sortColumn) {
+        case 'nombre':          cmp = `${a.nombre} ${a.apellidos}`.localeCompare(`${b.nombre} ${b.apellidos}`); break;
+        case 'dni':             cmp = (a.dni ?? '').localeCompare(b.dni ?? ''); break;
+        case 'fechaNacimiento': cmp = (a.fechaNacimiento ?? '').localeCompare(b.fechaNacimiento ?? ''); break;
+        case 'localidad':       cmp = (a.localidad ?? '').localeCompare(b.localidad ?? ''); break;
+      }
+      return this.sortDirection === 'asc' ? cmp : -cmp;
+    });
   }
 
   nextPage() {
-    if (this.currentPage < this.totalPages) { this.currentPage++; this.applyFilters(); }
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.applyFilters();
+    }
   }
 
   prevPage() {
-    if (this.currentPage > 1) { this.currentPage--; this.applyFilters(); }
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.applyFilters();
+    }
   }
 
   volverAlMenu() {
     this.router.navigate(['/menu']);
+  }
+
+  irACitas() {
+    this.router.navigate(['/citas']);
   }
 
   verFicha(cliente: Cliente) {
@@ -113,6 +164,8 @@ export class ClientesList implements OnInit {
     this.graduaciones = [];
     this.mostrarFormGraduacion = false;
     this.errorModal = null;
+    this.citasCliente = [];
+    this.ventasCliente = [];
   }
 
   cerrarFicha() {
@@ -123,14 +176,22 @@ export class ClientesList implements OnInit {
     this.graduaciones = [];
     this.mostrarFormGraduacion = false;
     this.errorModal = null;
+    this.citasCliente = [];
+    this.ventasCliente = [];
   }
 
-  cambiarVista(vista: 'datos' | 'graduaciones') {
+  cambiarVista(vista: 'datos' | 'graduaciones' | 'citas' | 'ventas') {
     this.vistaFicha = vista;
     this.modoEdicion = false;
     this.errorModal = null;
     if (vista === 'graduaciones' && this.clienteSeleccionado?.id && this.graduaciones.length === 0) {
       this.cargarGraduaciones();
+    }
+    if (vista === 'citas' && this.clienteSeleccionado?.id && this.citasCliente.length === 0) {
+      this.cargarCitasCliente();
+    }
+    if (vista === 'ventas' && this.clienteSeleccionado?.id && this.ventasCliente.length === 0) {
+      this.cargarVentasCliente();
     }
   }
 
@@ -152,7 +213,7 @@ export class ClientesList implements OnInit {
     this.errorModal = null;
     this.clienteService.updateCliente(this.clienteSeleccionado.id, this.clienteEditando).subscribe({
       next: (actualizado: Cliente) => {
-        const idx = this.clientesOriginales.findIndex(c => c.id === actualizado.id);
+        const idx = this.clientesOriginales.findIndex((c) => c.id === actualizado.id);
         if (idx !== -1) this.clientesOriginales[idx] = actualizado;
         this.clienteSeleccionado = actualizado;
         this.modoEdicion = false;
@@ -162,20 +223,27 @@ export class ClientesList implements OnInit {
       error: () => {
         this.errorModal = 'Error al guardar. Intenta de nuevo.';
         this.guardando = false;
-      }
+      },
     });
   }
 
   eliminarCliente(cliente: Cliente) {
     if (!cliente.id) return;
-    if (!confirm(`¿Eliminar a ${cliente.nombre} ${cliente.apellidos}? Esta acción no se puede deshacer.`)) return;
+    if (
+      !confirm(
+        `¿Eliminar a ${cliente.nombre} ${cliente.apellidos}? Esta acción no se puede deshacer.`,
+      )
+    )
+      return;
     this.clienteService.deleteCliente(cliente.id).subscribe({
       next: () => {
-        this.clientesOriginales = this.clientesOriginales.filter(c => c.id !== cliente.id);
+        this.clientesOriginales = this.clientesOriginales.filter((c) => c.id !== cliente.id);
         this.cerrarFicha();
         this.applyFilters();
       },
-      error: () => { this.errorModal = 'Error al eliminar. Intenta de nuevo.'; }
+      error: () => {
+        this.errorModal = 'Error al eliminar. Intenta de nuevo.';
+      },
     });
   }
 
@@ -184,10 +252,15 @@ export class ClientesList implements OnInit {
     this.cargandoGraduaciones = true;
     this.graduacionService.getByClienteId(this.clienteSeleccionado.id).subscribe({
       next: (data: Graduacion[]) => {
-        this.graduaciones = data.sort((a, b) => (b.fechaRevision ?? '').localeCompare(a.fechaRevision ?? ''));
+        this.graduaciones = data.sort((a, b) =>
+          (b.fechaRevision ?? '').localeCompare(a.fechaRevision ?? ''),
+        );
+        this.cargandoGraduaciones = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
         this.cargandoGraduaciones = false;
       },
-      error: () => { this.cargandoGraduaciones = false; }
     });
   }
 
@@ -195,9 +268,18 @@ export class ClientesList implements OnInit {
     this.nuevaGraduacion = {
       cliente: { id: this.clienteSeleccionado?.id as number },
       fechaRevision: new Date().toISOString().split('T')[0],
-      odEsfera: 0, odCilindro: 0, odEje: 0, odAdicion: undefined, avOd: undefined,
-      oiEsfera: 0, oiCilindro: 0, oiEje: 0, oiAdicion: undefined, avOi: undefined,
-      dip: undefined, observaciones: ''
+      odEsfera: 0,
+      odCilindro: 0,
+      odEje: 0,
+      odAdicion: undefined,
+      avOd: undefined,
+      oiEsfera: 0,
+      oiCilindro: 0,
+      oiEje: 0,
+      oiAdicion: undefined,
+      avOi: undefined,
+      dip: undefined,
+      observaciones: '',
     };
     this.mostrarFormGraduacion = true;
     this.errorGraduacion = null;
@@ -205,41 +287,101 @@ export class ClientesList implements OnInit {
 
   cancelarFormGraduacion() {
     this.mostrarFormGraduacion = false;
-    this.nuevaGraduacion = {};
+    this.nuevaGraduacion = {} as Graduacion;
     this.errorGraduacion = null;
   }
 
   guardarGraduacion() {
-    if (!this.nuevaGraduacion.fechaRevision) { this.errorGraduacion = 'La fecha es obligatoria.'; return; }
+    if (!this.nuevaGraduacion.fechaRevision) {
+      this.errorGraduacion = 'La fecha es obligatoria.';
+      return;
+    }
     this.creandoGraduacion = true;
     this.errorGraduacion = null;
-    this.graduacionService.createGraduacion(this.nuevaGraduacion as Omit<Graduacion, 'id'>).subscribe({
-      next: (creada: Graduacion) => {
-        this.graduaciones.unshift(creada);
-        this.cancelarFormGraduacion();
-        this.creandoGraduacion = false;
-      },
-      error: () => {
-        this.errorGraduacion = 'Error al guardar la graduación. Intenta de nuevo.';
-        this.creandoGraduacion = false;
-      }
-    });
+    this.graduacionService
+      .createGraduacion(this.nuevaGraduacion as Omit<Graduacion, 'id'>)
+      .subscribe({
+        next: (creada: Graduacion) => {
+          this.graduaciones.unshift(creada);
+          this.cancelarFormGraduacion();
+          this.creandoGraduacion = false;
+        },
+        error: () => {
+          this.errorGraduacion = 'Error al guardar la graduación. Intenta de nuevo.';
+          this.creandoGraduacion = false;
+        },
+      });
   }
 
   eliminarGraduacion(grad: Graduacion) {
     if (!grad.id) return;
     if (!confirm('¿Eliminar esta graduación del historial?')) return;
     this.graduacionService.deleteGraduacion(grad.id).subscribe({
-      next: () => { this.graduaciones = this.graduaciones.filter(g => g.id !== grad.id); },
-      error: () => {}
+      next: () => {
+        this.graduaciones = this.graduaciones.filter((g) => g.id !== grad.id);
+      },
+      error: () => {},
     });
+  }
+
+  cargarCitasCliente() {
+    if (!this.clienteSeleccionado?.id) return;
+    this.cargandoCitas = true;
+    this.citaService.getCitasByCliente(this.clienteSeleccionado.id).subscribe({
+      next: (data: Cita[]) => {
+        this.citasCliente = data.sort((a, b) => b.fechaHora.localeCompare(a.fechaHora));
+        this.cargandoCitas = false;
+        this.cdr.detectChanges();
+      },
+      error: () => { this.cargandoCitas = false; },
+    });
+  }
+
+  cargarVentasCliente() {
+    if (!this.clienteSeleccionado?.id) return;
+    this.cargandoVentas = true;
+    this.ventaService.getVentasByCliente(this.clienteSeleccionado.id).subscribe({
+      next: (data: Venta[]) => {
+        this.ventasCliente = data.sort((a, b) => b.fechaVenta.localeCompare(a.fechaVenta));
+        this.cargandoVentas = false;
+        this.cdr.detectChanges();
+      },
+      error: () => { this.cargandoVentas = false; },
+    });
+  }
+
+  fechaCitaFicha(c: Cita): string {
+    return c.fechaHora ? c.fechaHora.split('T')[0] : '';
+  }
+
+  horaCitaFicha(c: Cita): string {
+    return c.fechaHora ? (c.fechaHora.split('T')[1] ?? '').substring(0, 5) : '';
+  }
+
+  estadoCitaClass(estado: EstadoCita): string {
+    switch (estado) {
+      case 'PENDIENTE':  return 'bg-blue-100 text-blue-700 border border-blue-300';
+      case 'COMPLETADA': return 'bg-green-100 text-green-700 border border-green-300';
+      case 'CANCELADA':  return 'bg-gray-100 text-gray-400 border border-gray-300';
+    }
+  }
+
+  fechaVentaFicha(v: Venta): string {
+    return v.fechaVenta ? v.fechaVenta.split('T')[0] : '';
   }
 
   abrirNuevo() {
     this.nuevoCliente = {
-      nombre: '', apellidos: '', dni: '', telefono: '',
-      direccion: '', edad: '', fechaNacimiento: '',
-      localidad: '', provincia: '', codigoPostal: ''
+      nombre: '',
+      apellidos: '',
+      dni: '',
+      telefono: '',
+      direccion: '',
+      edad: '',
+      fechaNacimiento: '',
+      localidad: '',
+      provincia: '',
+      codigoPostal: '',
     };
     this.mostrarNuevo = true;
     this.errorNuevo = null;
@@ -269,7 +411,7 @@ export class ClientesList implements OnInit {
       error: () => {
         this.errorNuevo = 'Error al crear el cliente. Intenta de nuevo.';
         this.creando = false;
-      }
+      },
     });
   }
 }

@@ -27,7 +27,7 @@ public class UsuarioService {
     }
 
     public UsuarioModel guardarUsuario(UsuarioModel usuario) {
-        // Encripta la contraseña con BCrypt solo si no está ya hasheada
+        // Si ya llega hasheado (edición sin cambio de contraseña) no vuelvo a hashear para no corromperlo
         String pass = usuario.getContrasenya();
         if (pass != null && !pass.startsWith("$2a$") && !pass.startsWith("$2b$")) {
             usuario.setContrasenya(passwordEncoder.encode(pass));
@@ -35,6 +35,7 @@ public class UsuarioService {
         return usuarioRepository.save(usuario);
     }
 
+    // Devuelvo boolean para que el controlador pueda responder 204 o 404 según si existía el usuario
     public boolean eliminarUsuario(Long id) {
         try {
             usuarioRepository.deleteById(id);
