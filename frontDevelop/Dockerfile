@@ -29,7 +29,7 @@ RUN if [ -z "${API_URL}" ]; then echo "WARNING: API_URL no está definida, las l
 RUN npm run build
 
 # ============================================================
-# Stage 2 — Imagen de ejecución (servidor SSR Express)
+# Stage 2 — Imagen de ejecución (Express estático, sin SSR)
 # ============================================================
 FROM node:20-alpine AS runtime
 
@@ -46,5 +46,5 @@ EXPOSE 4000
 # Inyectar como Config Var en Railway con el valor real del servicio backend.
 ENV API_URL=""
 
-# Arrancar el servidor SSR de Angular
+# Arrancar Express como servidor estático SPA (sin SSR)
 CMD ["node", "dist/frontDevelop/server/server.mjs"]
