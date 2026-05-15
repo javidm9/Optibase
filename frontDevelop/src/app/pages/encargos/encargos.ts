@@ -120,6 +120,7 @@ export class EncargosPage implements OnInit {
       error: () => {
         this.errorCarga = 'No se pudo conectar con el servidor. Verifica que el backend esté activo.';
         this.cargando = false;
+        this.cdr.detectChanges();
       },
     });
   }
@@ -192,6 +193,7 @@ export class EncargosPage implements OnInit {
       next: () => {
         this.encargos = this.encargos.filter((e) => e.id !== encargo.id);
         this.aplicarFiltros();
+        this.cdr.detectChanges();
       },
       error: () => {
         this.errorCarga = 'Error al eliminar el encargo. Intenta de nuevo.';
@@ -267,6 +269,7 @@ export class EncargosPage implements OnInit {
       error: (err) => {
         this.errorNuevo = err.error?.error ?? 'Error al crear el encargo. Intenta de nuevo.';
         this.creando = false;
+        this.cdr.detectChanges();
       },
     });
   }

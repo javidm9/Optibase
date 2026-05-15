@@ -27,6 +27,8 @@ export class VentasPage implements OnInit {
   filtroCliente = '';
   filtroFecha = '';
   filtroPagado = '';
+  fechaDesde = '';
+  fechaHasta = '';
 
   currentPage = 1;
   itemsPerPage = 20;
@@ -84,6 +86,7 @@ export class VentasPage implements OnInit {
       error: () => {
         this.errorCarga = 'No se pudo conectar con el servidor. Verifica que el backend esté activo.';
         this.cargando = false;
+        this.cdr.detectChanges();
       },
     });
   }
@@ -102,6 +105,14 @@ export class VentasPage implements OnInit {
 
     if (this.filtroFecha) {
       resultado = resultado.filter((v) => v.fechaVenta.startsWith(this.filtroFecha));
+    }
+
+    if (this.fechaDesde) {
+      resultado = resultado.filter((v) => v.fechaVenta.substring(0, 10) >= this.fechaDesde);
+    }
+
+    if (this.fechaHasta) {
+      resultado = resultado.filter((v) => v.fechaVenta.substring(0, 10) <= this.fechaHasta);
     }
 
     if (this.filtroPagado !== '') {
@@ -169,6 +180,16 @@ export class VentasPage implements OnInit {
     return v.fechaVenta ? (v.fechaVenta.split('T')[1] ?? '').substring(0, 5) : '';
   }
 
+  limpiarFiltros() {
+    this.filtroCliente = '';
+    this.filtroFecha = '';
+    this.filtroPagado = '';
+    this.fechaDesde = '';
+    this.fechaHasta = '';
+    this.currentPage = 1;
+    this.aplicarFiltros();
+  }
+
   eliminarVenta(venta: Venta) {
     if (!venta.id) return;
     if (!confirm(`¿Eliminar la venta #${venta.id}? Esta acción no se puede deshacer.`)) return;
@@ -176,6 +197,7 @@ export class VentasPage implements OnInit {
       next: () => {
         this.ventas = this.ventas.filter((v) => v.id !== venta.id);
         this.aplicarFiltros();
+        this.cdr.detectChanges();
       },
       error: () => {
         this.errorCarga = 'Error al eliminar la venta. Intenta de nuevo.';
@@ -243,6 +265,7 @@ export class VentasPage implements OnInit {
       error: (err) => {
         this.errorNueva = err.error?.error ?? 'Error al registrar la venta. Intenta de nuevo.';
         this.creando = false;
+        this.cdr.detectChanges();
       },
     });
   }

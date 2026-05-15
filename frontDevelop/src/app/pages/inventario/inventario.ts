@@ -72,6 +72,7 @@ export class InventarioPage implements OnInit {
       error: () => {
         this.errorCarga = 'No se pudo conectar con el servidor. Verifica la conexión.';
         this.cargando = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -196,12 +197,14 @@ export class InventarioPage implements OnInit {
         this.modoEdicion = false;
         this.guardando = false;
         this.aplicarFiltros();
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.errorModal = err.status === 400
           ? 'El servidor ha rechazado la operación (stock inválido).'
           : 'Error al guardar. Intenta de nuevo.';
         this.guardando = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -214,8 +217,12 @@ export class InventarioPage implements OnInit {
         this.articulos = this.articulos.filter(a => a.id !== articulo.id);
         this.cerrarModal();
         this.aplicarFiltros();
+        this.cdr.detectChanges();
       },
-      error: () => { this.errorModal = 'Error al eliminar. Intenta de nuevo.'; }
+      error: () => {
+        this.errorModal = 'Error al eliminar. Intenta de nuevo.';
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -256,12 +263,14 @@ export class InventarioPage implements OnInit {
         this.cerrarNuevo();
         this.creando = false;
         this.aplicarFiltros();
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.errorNuevo = err.status === 400
           ? 'El servidor ha rechazado la operación (stock inválido).'
           : 'Error al crear el artículo. Intenta de nuevo.';
         this.creando = false;
+        this.cdr.detectChanges();
       }
     });
   }

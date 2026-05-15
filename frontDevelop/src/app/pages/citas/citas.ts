@@ -115,6 +115,7 @@ export class CitasPage implements OnInit {
       error: () => {
         this.errorCarga = 'No se pudo conectar con el servidor. Verifica la conexión.';
         this.cargando = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -325,12 +326,14 @@ export class CitasPage implements OnInit {
         this.modoEdicion = false;
         this.guardando = false;
         this.aplicarFiltros();
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.errorModal = err.status === 409
           ? 'CONFLICTO: Ya existe una cita programada en ese horario.'
           : 'Error al guardar. Intenta de nuevo.';
         this.guardando = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -345,8 +348,12 @@ export class CitasPage implements OnInit {
         this.citaSeleccionada = actualizada;
         this.modoEdicion = false;
         this.aplicarFiltros();
+        this.cdr.detectChanges();
       },
-      error: () => { this.errorModal = 'Error al cancelar. Intenta de nuevo.'; }
+      error: () => {
+        this.errorModal = 'Error al cancelar. Intenta de nuevo.';
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -405,12 +412,14 @@ export class CitasPage implements OnInit {
         this.cerrarNueva();
         this.creando = false;
         this.aplicarFiltros();
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.errorNueva = err.status === 409
           ? 'CONFLICTO: Ya existe una cita programada en ese horario.'
           : 'Error al crear la cita. Intenta de nuevo.';
         this.creando = false;
+        this.cdr.detectChanges();
       }
     });
   }

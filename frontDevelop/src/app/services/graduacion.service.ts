@@ -19,6 +19,10 @@ export class GraduacionService {
     return this.http.post<Graduacion>(this.apiUrl, graduacion);
   }
 
+  updateGraduacion(id: number, graduacion: Partial<Graduacion>): Observable<Graduacion> {
+    return this.http.put<Graduacion>(`${this.apiUrl}/${id}`, graduacion);
+  }
+
   deleteGraduacion(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }

@@ -383,6 +383,105 @@
       </div>
       }
 
+      <!-- Formulario edición graduación -->
+      @if (mostrarFormEdicionGraduacion && graduacionEditando) {
+      <div class="border-2 border-gray-950 p-4 bg-white">
+        <p class="font-mono text-[9px] font-black text-gray-950 uppercase tracking-widest mb-3">EDITAR GRADUACIÓN</p>
+        <div class="grid grid-cols-2 gap-x-6 gap-y-3 mb-4">
+          <div class="col-span-2 border-b-2 border-gray-950">
+            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Fecha</label>
+            <input [(ngModel)]="graduacionEditando.fechaRevision" type="date"
+              class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
+          </div>
+          <!-- OD -->
+          <div>
+            <p class="text-[9px] font-black text-gray-950 uppercase tracking-widest mb-2 border-b border-gray-300 pb-1">OJO DERECHO</p>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[8px] text-gray-400 uppercase">Esfera</label>
+                <input [(ngModel)]="graduacionEditando.odEsfera" type="number" step="0.25"
+                  class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
+              </div>
+              <div>
+                <label class="block text-[8px] text-gray-400 uppercase">Cilindro</label>
+                <input [(ngModel)]="graduacionEditando.odCilindro" type="number" step="0.25"
+                  class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
+              </div>
+              <div>
+                <label class="block text-[8px] text-gray-400 uppercase">Eje</label>
+                <input [(ngModel)]="graduacionEditando.odEje" type="number" step="1" min="0" max="180"
+                  class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
+              </div>
+              <div>
+                <label class="block text-[8px] text-gray-400 uppercase">Adición</label>
+                <input [(ngModel)]="graduacionEditando.odAdicion" type="number" step="0.25"
+                  class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
+              </div>
+              <div class="col-span-2">
+                <label class="block text-[8px] text-gray-400 uppercase">Agudeza Visual OD</label>
+                <input [(ngModel)]="graduacionEditando.avOd" type="number" step="0.1" min="0" max="2"
+                  class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
+              </div>
+            </div>
+          </div>
+          <!-- OI -->
+          <div>
+            <p class="text-[9px] font-black text-gray-950 uppercase tracking-widest mb-2 border-b border-gray-300 pb-1">OJO IZQUIERDO</p>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[8px] text-gray-400 uppercase">Esfera</label>
+                <input [(ngModel)]="graduacionEditando.oiEsfera" type="number" step="0.25"
+                  class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
+              </div>
+              <div>
+                <label class="block text-[8px] text-gray-400 uppercase">Cilindro</label>
+                <input [(ngModel)]="graduacionEditando.oiCilindro" type="number" step="0.25"
+                  class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
+              </div>
+              <div>
+                <label class="block text-[8px] text-gray-400 uppercase">Eje</label>
+                <input [(ngModel)]="graduacionEditando.oiEje" type="number" step="1" min="0" max="180"
+                  class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
+              </div>
+              <div>
+                <label class="block text-[8px] text-gray-400 uppercase">Adición</label>
+                <input [(ngModel)]="graduacionEditando.oiAdicion" type="number" step="0.25"
+                  class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
+              </div>
+              <div class="col-span-2">
+                <label class="block text-[8px] text-gray-400 uppercase">Agudeza Visual OI</label>
+                <input [(ngModel)]="graduacionEditando.avOi" type="number" step="0.1" min="0" max="2"
+                  class="w-full bg-transparent border-b border-gray-300 outline-none py-0.5 text-xs font-mono font-bold">
+              </div>
+            </div>
+          </div>
+          <div class="col-span-2 border-b-2 border-gray-950">
+            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Distancia Interpupilar (mm)</label>
+            <input [(ngModel)]="graduacionEditando.dip" type="number" step="0.5" min="50" max="80"
+              class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
+          </div>
+          <div class="col-span-2 border-b-2 border-gray-950">
+            <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Observaciones</label>
+            <input [(ngModel)]="graduacionEditando.observaciones" class="w-full bg-transparent outline-none py-1 text-sm"
+              placeholder="Notas opcionales...">
+          </div>
+        </div>
+        @if (errorGraduacion) {
+        <p class="font-mono text-xs text-red-500 font-bold mb-2">ERROR: {{errorGraduacion}}</p>
+        }
+        <div class="flex gap-3">
+          <button (click)="guardarEdicionGraduacion()" [disabled]="creandoGraduacion"
+            class="px-4 py-1.5 font-black text-[10px] uppercase bg-gray-950 text-white hover:bg-blue-600 transition-all cursor-pointer disabled:opacity-50">
+            {{creandoGraduacion ? 'GUARDANDO...' : 'GUARDAR CAMBIOS'}}
+          </button>
+          <button (click)="cancelarEdicionGraduacion()"
+            class="px-4 py-1.5 font-black text-[10px] uppercase border-2 border-gray-950 hover:bg-gray-950 hover:text-white transition-all cursor-pointer">
+            CANCELAR
+          </button>
+        </div>
+      </div>
+      }
+
       <!-- Lista de graduaciones -->
       @if (cargandoGraduaciones) {
       <span class="font-mono text-xs text-gray-400 animate-pulse">Cargando historial...</span>
@@ -415,7 +514,9 @@
               </td>
               <td class="p-3 text-gray-500 border-r border-gray-100 text-[10px] max-w-[200px]">
                 {{g.observaciones || '—'}}</td>
-              <td class="p-3 text-right">
+              <td class="p-3 text-right flex gap-2 justify-end">
+                <button (click)="abrirEdicionGraduacion(g)"
+                  class="text-[9px] font-black text-blue-500 hover:text-blue-700 uppercase font-mono cursor-pointer">EDITAR</button>
                 <button (click)="eliminarGraduacion(g)"
                   class="text-[9px] font-black text-red-400 hover:text-red-600 uppercase font-mono cursor-pointer">ELIMINAR</button>
               </td>

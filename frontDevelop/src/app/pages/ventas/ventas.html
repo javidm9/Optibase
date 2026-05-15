@@ -34,7 +34,7 @@
     </div>
   </header>
 
-  <section class="shrink-0 grid grid-cols-1 md:grid-cols-3 gap-8 mb-6 px-2">
+  <section class="shrink-0 grid grid-cols-2 md:grid-cols-5 gap-6 mb-6 px-2 items-end">
     <div class="border-l-4 border-gray-950 pl-4">
       <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Filtro Cliente</label>
       <input [(ngModel)]="filtroCliente" (input)="currentPage=1; aplicarFiltros()" type="text"
@@ -47,13 +47,29 @@
         class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
     </div>
     <div class="border-l-4 border-gray-950 pl-4">
-      <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Estado Pago</label>
-      <select [(ngModel)]="filtroPagado" (change)="currentPage=1; aplicarFiltros()"
-        class="w-full bg-transparent outline-none py-1 text-sm font-bold cursor-pointer">
-        <option value="">Todos</option>
-        <option value="false">Pendiente</option>
-        <option value="true">Pagado</option>
-      </select>
+      <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Desde</label>
+      <input [(ngModel)]="fechaDesde" (change)="currentPage=1; aplicarFiltros()" type="date"
+        class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
+    </div>
+    <div class="border-l-4 border-gray-950 pl-4">
+      <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Hasta</label>
+      <input [(ngModel)]="fechaHasta" (change)="currentPage=1; aplicarFiltros()" type="date"
+        class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
+    </div>
+    <div class="flex flex-col gap-2">
+      <div class="border-l-4 border-gray-950 pl-4">
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Estado Pago</label>
+        <select [(ngModel)]="filtroPagado" (change)="currentPage=1; aplicarFiltros()"
+          class="w-full bg-transparent outline-none py-1 text-sm font-bold cursor-pointer">
+          <option value="">Todos</option>
+          <option value="false">Pendiente</option>
+          <option value="true">Pagado</option>
+        </select>
+      </div>
+      <button (click)="limpiarFiltros()"
+        class="font-mono text-[9px] font-black border-2 border-gray-400 px-3 py-1 hover:border-gray-950 hover:bg-gray-950 hover:text-white transition-all uppercase tracking-widest cursor-pointer">
+        LIMPIAR FILTROS
+      </button>
     </div>
   </section>
 

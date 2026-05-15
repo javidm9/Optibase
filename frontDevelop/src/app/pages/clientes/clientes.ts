@@ -53,6 +53,9 @@ export class ClientesList implements OnInit {
   creandoGraduacion = false;
   errorGraduacion: string | null = null;
 
+  graduacionEditando: Graduacion | null = null;
+  mostrarFormEdicionGraduacion = false;
+
   citasCliente: Cita[] = [];
   cargandoCitas = false;
   ventasCliente: Venta[] = [];
@@ -219,10 +222,12 @@ export class ClientesList implements OnInit {
         this.modoEdicion = false;
         this.guardando = false;
         this.applyFilters();
+        this.cdr.detectChanges();
       },
       error: () => {
         this.errorModal = 'Error al guardar. Intenta de nuevo.';
         this.guardando = false;
+        this.cdr.detectChanges();
       },
     });
   }
@@ -240,9 +245,11 @@ export class ClientesList implements OnInit {
         this.clientesOriginales = this.clientesOriginales.filter((c) => c.id !== cliente.id);
         this.cerrarFicha();
         this.applyFilters();
+        this.cdr.detectChanges();
       },
       error: () => {
         this.errorModal = 'Error al eliminar. Intenta de nuevo.';
+        this.cdr.detectChanges();
       },
     });
   }
@@ -305,10 +312,12 @@ export class ClientesList implements OnInit {
           this.graduaciones.unshift(creada);
           this.cancelarFormGraduacion();
           this.creandoGraduacion = false;
+          this.cdr.detectChanges();
         },
         error: () => {
           this.errorGraduacion = 'Error al guardar la graduación. Intenta de nuevo.';
           this.creandoGraduacion = false;
+          this.cdr.detectChanges();
         },
       });
   }
@@ -319,8 +328,47 @@ export class ClientesList implements OnInit {
     this.graduacionService.deleteGraduacion(grad.id).subscribe({
       next: () => {
         this.graduaciones = this.graduaciones.filter((g) => g.id !== grad.id);
+        this.cdr.detectChanges();
       },
-      error: () => {},
+      error: () => {
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  abrirEdicionGraduacion(g: Graduacion) {
+    this.graduacionEditando = { ...g };
+    this.mostrarFormEdicionGraduacion = true;
+    this.errorGraduacion = null;
+  }
+
+  cancelarEdicionGraduacion() {
+    this.graduacionEditando = null;
+    this.mostrarFormEdicionGraduacion = false;
+    this.errorGraduacion = null;
+  }
+
+  guardarEdicionGraduacion() {
+    if (!this.graduacionEditando?.id) return;
+    if (!this.graduacionEditando.fechaRevision) {
+      this.errorGraduacion = 'La fecha es obligatoria.';
+      return;
+    }
+    this.creandoGraduacion = true;
+    this.errorGraduacion = null;
+    this.graduacionService.updateGraduacion(this.graduacionEditando.id, this.graduacionEditando).subscribe({
+      next: (actualizada: Graduacion) => {
+        const idx = this.graduaciones.findIndex((g) => g.id === actualizada.id);
+        if (idx !== -1) this.graduaciones[idx] = actualizada;
+        this.cancelarEdicionGraduacion();
+        this.creandoGraduacion = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.errorGraduacion = 'Error al guardar la graduación. Intenta de nuevo.';
+        this.creandoGraduacion = false;
+        this.cdr.detectChanges();
+      },
     });
   }
 
@@ -407,10 +455,12 @@ export class ClientesList implements OnInit {
         this.cerrarNuevo();
         this.creando = false;
         this.applyFilters();
+        this.cdr.detectChanges();
       },
       error: () => {
         this.errorNuevo = 'Error al crear el cliente. Intenta de nuevo.';
         this.creando = false;
+        this.cdr.detectChanges();
       },
     });
   }
