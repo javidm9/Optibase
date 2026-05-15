@@ -93,6 +93,12 @@ export class CitasPage implements OnInit {
     return c.fechaHora ? c.fechaHora.split('T')[0] : '';
   }
 
+  displayFechaCita(c: Cita): string {
+    if (!c.fechaHora) return '';
+    const [y, m, d] = c.fechaHora.split('T')[0].split('-');
+    return (d && m && y) ? `${d}/${m}/${y}` : '';
+  }
+
   horaCita(c: Cita): string {
     return c.fechaHora ? (c.fechaHora.split('T')[1] ?? '').substring(0, 5) : '';
   }

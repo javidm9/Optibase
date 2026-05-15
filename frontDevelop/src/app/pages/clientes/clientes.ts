@@ -398,8 +398,15 @@ export class ClientesList implements OnInit {
     });
   }
 
+  formatFecha(iso: string | null | undefined): string {
+    if (!iso) return '';
+    const part = iso.split('T')[0];
+    const [y, m, d] = part.split('-');
+    return (d && m && y) ? `${d}/${m}/${y}` : part;
+  }
+
   fechaCitaFicha(c: Cita): string {
-    return c.fechaHora ? c.fechaHora.split('T')[0] : '';
+    return this.formatFecha(c.fechaHora);
   }
 
   horaCitaFicha(c: Cita): string {
@@ -415,7 +422,7 @@ export class ClientesList implements OnInit {
   }
 
   fechaVentaFicha(v: Venta): string {
-    return v.fechaVenta ? v.fechaVenta.split('T')[0] : '';
+    return this.formatFecha(v.fechaVenta);
   }
 
   abrirNuevo() {

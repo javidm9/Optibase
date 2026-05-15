@@ -124,7 +124,9 @@ export class EstadisticasPage implements OnInit {
   }
 
   fechaCorta(iso: string): string {
-    return iso ? iso.split('T')[0] : '';
+    if (!iso) return '';
+    const [y, m, d] = iso.split('T')[0].split('-');
+    return (d && m && y) ? `${d}/${m}/${y}` : '';
   }
 
   horaCorta(iso: string): string {

@@ -107,7 +107,7 @@
         <tbody class="text-[12px] divide-y divide-gray-100">
           @for (c of citasFiltradas; track c.id) {
             <tr class="hover:bg-gray-50 transition-colors" [class.opacity-50]="c.estado === 'CANCELADA'">
-              <td class="p-2 font-mono font-bold border-r border-gray-50">{{fechaCita(c)}}</td>
+              <td class="p-2 font-mono font-bold border-r border-gray-50">{{displayFechaCita(c)}}</td>
               <td class="p-2 font-mono font-bold text-blue-600 border-r border-gray-50">{{horaCita(c)}}</td>
               <td class="p-2 font-bold border-r border-gray-50">{{nombreCliente(c)}}</td>
               <td class="p-2 text-gray-600 border-r border-gray-50 truncate max-w-[280px]">{{c.motivo}}</td>
@@ -286,7 +286,7 @@
         <div class="p-6 grid grid-cols-2 gap-x-8 gap-y-5 grow">
           <div>
             <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Fecha</span>
-            <span class="font-mono font-bold text-sm">{{fechaCita(citaSeleccionada)}}</span>
+            <span class="font-mono font-bold text-sm">{{displayFechaCita(citaSeleccionada)}}</span>
           </div>
           <div>
             <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Hora</span>

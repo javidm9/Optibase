@@ -173,7 +173,9 @@ export class VentasPage implements OnInit {
   }
 
   fechaVenta(v: Venta): string {
-    return v.fechaVenta ? v.fechaVenta.split('T')[0] : '';
+    if (!v.fechaVenta) return '';
+    const [y, m, d] = v.fechaVenta.split('T')[0].split('-');
+    return (d && m && y) ? `${d}/${m}/${y}` : '';
   }
 
   horaVenta(v: Venta): string {

@@ -168,11 +168,15 @@ export class EncargosPage implements OnInit {
   }
 
   fechaEncargo(e: Encargo): string {
-    return e.fechaEncargo ? e.fechaEncargo.split('T')[0] : '';
+    if (!e.fechaEncargo) return '';
+    const [y, m, d] = e.fechaEncargo.split('T')[0].split('-');
+    return (d && m && y) ? `${d}/${m}/${y}` : '';
   }
 
   fechaEntrega(e: Encargo): string {
-    return e.fechaEntregaPrevista ? e.fechaEntregaPrevista.split('T')[0] : '—';
+    if (!e.fechaEntregaPrevista) return '—';
+    const [y, m, d] = e.fechaEntregaPrevista.split('T')[0].split('-');
+    return (d && m && y) ? `${d}/${m}/${y}` : '—';
   }
 
   estadoClass(estado: string): string {

@@ -79,7 +79,7 @@
           <td class="p-2 font-bold text-gray-950 border-r border-gray-50 text-sm">{{p.nombre}} {{p.apellidos}}</td>
           <td class="p-2 font-mono border-r border-gray-50 font-bold tracking-tighter">{{p.dni}}</td>
           <td class="p-2 font-mono border-r border-gray-50 text-gray-600">{{p.telefono}}</td>
-          <td class="p-2 border-r border-gray-50 font-mono">{{p.fechaNacimiento}} <span
+          <td class="p-2 border-r border-gray-50 font-mono">{{formatFecha(p.fechaNacimiento)}} <span
               class="text-gray-400 font-bold">({{p.edad}})</span></td>
           <td class="p-2 border-r border-gray-50 text-gray-500 truncate text-[11px]">{{p.direccion}}, {{p.localidad}}
             <span class="text-[9px]">[{{p.codigoPostal}}]</span>
@@ -186,7 +186,7 @@
       </div>
       <div>
         <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Fecha Nacimiento</span>
-        <span class="font-mono font-bold text-sm">{{clienteSeleccionado.fechaNacimiento}}</span>
+        <span class="font-mono font-bold text-sm">{{formatFecha(clienteSeleccionado.fechaNacimiento)}}</span>
       </div>
       <div>
         <span class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Edad</span>
@@ -503,7 +503,7 @@
           <tbody class="divide-y divide-gray-100 text-sm">
             @for (g of graduaciones; track g.id) {
             <tr class="hover:bg-gray-50">
-              <td class="p-3 font-mono font-bold border-r border-gray-100">{{g.fechaRevision}}</td>
+              <td class="p-3 font-mono font-bold border-r border-gray-100">{{formatFecha(g.fechaRevision)}}</td>
               <td class="p-3 font-mono text-center border-r border-gray-100" colspan="3">
                 <span [class.text-red-500]="g.odEsfera < 0">{{g.odEsfera > 0 ? '+' : ''}}{{g.odEsfera}}</span>
                 / {{g.odCilindro}} / {{g.odEje}}°
