@@ -236,6 +236,7 @@
       <div class="border-b-2 border-gray-950">
         <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Fecha Nacimiento</label>
         <input [(ngModel)]="clienteEditando.fechaNacimiento" type="date"
+          (change)="clienteEditando.edad = calcularEdad(clienteEditando.fechaNacimiento)"
           class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
       </div>
       <div class="border-b-2 border-gray-950">
@@ -697,6 +698,7 @@
       <div class="border-b-2 border-gray-950">
         <label class="block text-[9px] font-black text-gray-400 uppercase tracking-widest">Fecha Nacimiento</label>
         <input [(ngModel)]="nuevoCliente.fechaNacimiento" type="date"
+          (change)="nuevoCliente.edad = calcularEdad(nuevoCliente.fechaNacimiento)"
           class="w-full bg-transparent outline-none py-1 text-sm font-mono font-bold">
       </div>
       <div class="border-b-2 border-gray-950">

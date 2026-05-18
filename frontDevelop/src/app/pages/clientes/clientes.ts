@@ -398,6 +398,16 @@ export class ClientesList implements OnInit {
     });
   }
 
+  calcularEdad(fechaNacimiento: string | undefined): string {
+    if (!fechaNacimiento) return '';
+    const hoy = new Date();
+    const nac = new Date(fechaNacimiento);
+    let edad = hoy.getFullYear() - nac.getFullYear();
+    const m = hoy.getMonth() - nac.getMonth();
+    if (m < 0 || (m === 0 && hoy.getDate() < nac.getDate())) edad--;
+    return edad >= 0 ? String(edad) : '';
+  }
+
   formatFecha(iso: string | null | undefined): string {
     if (!iso) return '';
     const part = iso.split('T')[0];
