@@ -218,7 +218,7 @@ cd frontDevelop
 docker build --build-arg API_URL=https://tu-backend.railway.app -t optibase-front .
 ```
 
-Variable de build requerida: `API_URL` (URL pública del backend).
+Variable de build requerida: `API_URL` (URL pública del backend)
 
 ---
 
